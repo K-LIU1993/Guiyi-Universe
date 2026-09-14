@@ -1,5 +1,6 @@
 // 成形作曲器 · 成形卡
 import { TYPE_META } from '../game/content.js';
+import { addCommunityQuestion } from '../game/questionPool.js';
 
 export class AnswerUI {
   constructor(cb) {
@@ -112,6 +113,31 @@ export class AnswerUI {
       if (i > 0) this.el('span', 'ap-arrow', path, '→');
       this.el('span', 'ap-node', path, nodes[i]);
     }
+    // 问题漂流：留下一个问题，飞回入口成为下一位旅人的参考标签
+    const drift = this.el('div', 'ans-row', m);
+    this.el('div', 'ar-label', drift, '留给下一位旅人的问题');
+    const driftWrap = this.el('div', 'drift-wrap', drift);
+    const driftInput = this.el('input', 'drift-input', driftWrap);
+    driftInput.maxLength = 40;
+    driftInput.value = String(ans.open || question || '').slice(0, 40);
+    driftInput.placeholder = '写下你想留给下一位旅人的问题……';
+    const flyBtn = this.el('button', 'btn small primary', driftWrap, '🕊 让它飞回入口');
+    this.el('div', 'drift-note', drift, '点「换个问题，再来一次」，它就会出现在入口标签里。');
+    flyBtn.addEventListener('click', () => {
+      const q = driftInput.value.trim();
+      if (q.length < 2) { driftInput.focus(); return; }
+      addCommunityQuestion(q);
+      const rect = flyBtn.getBoundingClientRect();
+      const flyEl = this.el('div', 'fly-question', document.body, '📮 ' + q);
+      flyEl.style.left = Math.round(rect.left) + 'px';
+      flyEl.style.top = Math.round(rect.top) + 'px';
+      requestAnimationFrame(() => requestAnimationFrame(() => flyEl.classList.add('fly-away')));
+      setTimeout(() => { if (flyEl.parentNode) flyEl.parentNode.removeChild(flyEl); }, 1700);
+      driftInput.disabled = true;
+      flyBtn.disabled = true;
+      flyBtn.textContent = '✓ 已飞回入口';
+      this.cb.onFlyBack(q);
+    });
     const foot = this.el('div', 'ans-foot', m);
     this.el('span', 'ans-date', foot, ans.date || '');
     const again = this.el('button', 'btn ghost', foot, '换个问题，再来一次');

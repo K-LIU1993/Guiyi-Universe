@@ -426,7 +426,11 @@ function boot() {
     () => state,
     () => collectedCards()
   );
-  answerUI = new AnswerUI({ onSubmit: onSubmit, onNewUniverse: onNewUniverse });
+  answerUI = new AnswerUI({
+    onSubmit: onSubmit,
+    onNewUniverse: onNewUniverse,
+    onFlyBack: () => hud.toast('📮 问题已飞回入口 · 下一位旅人会在入口遇见它')
+  });
 
   modes = createModes({
     get state() { return state; },

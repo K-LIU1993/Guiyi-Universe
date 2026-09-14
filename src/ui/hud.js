@@ -1,5 +1,6 @@
 // HUD：开场、顶栏、气泡、小地图、径向菜单、提示与音效
 import { REGIONS, REGION_MAP } from '../core/constants.js';
+import { pickEntryChips } from '../game/questionPool.js';
 
 // 极简 WebAudio：环境垫音 + 操作 blip
 export class Sfx {
@@ -240,6 +241,7 @@ export class HUD {
       '<div><b>4 遇见</b>：去遇见岛，听真实的人讲话。共鸣比观点更接近理解。</div>' +
       '<div><b>5 成形</b>：走够四个方向、见过他者、做过对照之后，中央岛为你打开。写下属于你的答案。</div>' +
       '<div>🌱 <b>Bloomy</b> 是你的同伴，点击它随时可以让它解释、比较、带路，或换个问法。</div>' +
+      '<div>📮 <b>问题漂流</b>：你在成形卡留下的问题会飞回入口，成为下一位旅人的参考标签。</div>' +
       '<div>✦ 传送门提示：走完 来路 / 此地 / 岔路 三岛，未至岛的门会为你点亮。</div>' +
       '<div>🖐 拖拽旋转 · 滚轮缩放 · 双击回到全景。</div>'
     );
@@ -257,24 +259,21 @@ export class HUD {
     this.el('div', 'intro-lede', card,
       '把一个问题交给宇宙，它不会直接给你答案——它会生成一片可探索的 3D 星域：六座浮岛，五步旅程。' +
       '你将穿过别人的来路、脚下的此地、分歧的岔路，遇见真实的人，照亮自己的盲点，最后在中央岛形成属于你的答案。');
-    this.el('div', 'intro-q', card, '选择一个问题，或写下你自己的');
+    this.el('div', 'intro-q', card, '看看别人在问什么 · 点一下作参考，或写下你自己的');
     const chips = this.el('div', 'intro-chips', card);
     this.chipEls = [];
-    const qs = [
-      ['paint', 'AI 时代，还要学画画吗？'],
-      ['job', '毕业后，先就业还是先创业？'],
-      ['switch', '30 岁转行，来得及吗？']
-    ];
+    // 每次打开页面随机换一批参考问题；旅人飞回的问题优先浮现
+    const qs = pickEntryChips(3);
     for (const it of qs) {
-      const c = this.el('button', 'chip', chips, it[1]);
+      const c = this.el('button', 'chip' + (it.from === 'comm' ? ' chip--comm' : ''), chips, (it.from === 'comm' ? '📮 ' : '') + it.q);
+      c.title = it.from === 'comm' ? '来自上一位旅人的问题' : '点击把问题填进下面，作为参考';
       c.addEventListener('click', () => {
-        this.selPack = it[0];
-        this.input.value = '';
+        this.input.value = it.q;
         this.chipEls.forEach((x) => x.classList.remove('active'));
         c.classList.add('active');
+        this.input.focus();
       });
       this.chipEls.push(c);
-      if (it[0] === this.selPack) c.classList.add('active');
     }
     const row = this.el('div', 'intro-input', card);
     this.input = this.el('input', '', row);
