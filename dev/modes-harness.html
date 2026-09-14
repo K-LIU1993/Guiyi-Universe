@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>六岛交互模式 Harness</title>
+<link rel="stylesheet" href="../src/game/modes/modes.css">
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; background: #14121c; color: #f5f1e8; display: flex; height: 100vh; }
+  #side { width: 220px; padding: 14px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid #333; }
+  #side button { padding: 8px; background: #241f33; color: #ffd166; border: 1px solid #55486a; border-radius: 8px; cursor: pointer; }
+  #fake3d { flex: 1; position: relative; background: radial-gradient(circle at 50% 60%, #26203a, #14121c); }
+  #fake3d .mode-wall__tiplabel { position: absolute; }
+  #log { position: fixed; right: 12px; top: 12px; width: 300px; max-height: 40vh; overflow: auto; font: 11px/1.5 monospace; background: #0008; padding: 8px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div id="side">
+  <b style="font-size:13px">选择岛屿模式</b>
+  <button data-k="lai">来路 · 故事小径</button>
+  <button data-k="cidi">此地 · 条件控制台</button>
+  <button data-k="cha">岔路 · 分岔桥</button>
+  <button data-k="yu">遇见 · 篝火围坐</button>
+  <button data-k="wei">未至 · 迷雾光门</button>
+  <button data-k="form">成形 · 关联壁</button>
+  <button id="leave">离开当前模式</button>
+</div>
+<div id="fake3d"></div>
+<div id="log"></div>
+<script type="module">
+  import lai from '../src/game/modes/lai-trail.js';
+  import cidi from '../src/game/modes/cidi-console.js';
+  import cha from '../src/game/modes/cha-fork.js';
+  import yu from '../src/game/modes/yu-campfire.js';
+  import wei from '../src/game/modes/wei-mist-gate.js';
+  import form from '../src/game/modes/form-idea-wall.js';
+
+  const MODES = { lai, cidi, cha, yu, wei, form };
+  const REG = { lai: 'experience', cidi: 'condition', cha: 'divide', yu: 'resonance', wei: 'unknown', form: 'integration' };
+  const cards = [
+    { id: 'c1', type: 'experience', t: '小时候第一次说"不"', who: '妈妈', body: ['那次我第一次顶嘴，家里安静了很久。'], ask: '你第一次说"不"是什么时候？', tags: [] },
+    { id: 'c2', type: 'experience', t: '离开家乡那天', who: '爸爸', body: ['站台上他没有说话，只是把行李又检查了一遍。'], ask: '你离开过什么？', tags: [] },
+    { id: 'c3', type: 'experience', t: '第一次被认可', who: '老师', body: ['她说"你可以的"，我记到今天。'], ask: '谁的一句话改变了你？', tags: [] },
+    { id: 'c4', type: 'condition', t: '有时间', who: '此地', body: ['每天其实有 3 个小时是自己的。'], ask: '如果真有时间，你会做什么？', tags: [] },
+    { id: 'c5', type: 'condition', t: '有支持', who: '朋友', body: ['有个人说"你去做，我帮你"。'], ask: '你的支持系统是谁？', tags: [] },
+    { id: 'c6', type: 'condition', t: '有最小版本', who: '此地', body: ['不用等一切就绪，先做最小的那一步。'], ask: '最小的一步是什么？', tags: [] },
+    { id: 'c7', type: 'divide', t: '稳定的工作', who: '岔路A', body: ['稳定，但一眼能看到十年后。'], ask: '稳定对你意味着什么？', tags: [] },
+    { id: 'c8', type: 'divide', t: '未知的尝试', who: '岔路B', body: ['不知道结果，但心跳是活的。'], ask: '你愿意为未知付出多少？', tags: [] },
+    { id: 'c9', type: 'resonance', t: '深夜的对话', who: '老友', body: ['凌晨两点，我们把彼此的困境都说了一遍。'], ask: '你上一次说真心话是什么时候？', tags: [] },
+    { id: 'c10', type: 'resonance', t: '陌生人的善意', who: '路人', body: ['地铁口有人帮我撑了十分钟伞。'], ask: '最近谁温暖过你？', tags: [] },
+    { id: 'c11', type: 'resonance', t: '同样的梦', who: '网友', body: ['原来有人和我做着一样放弃又捡起的梦。'], ask: '那个你反复捡起的东西是什么？', tags: [] },
+    { id: 'c12', type: 'unknown', t: '还没学会的能力', who: '未至', body: ['那件一直"以后再说"的事。'], ask: '什么时候才算"以后"？', tags: [] },
+    { id: 'c13', type: 'unknown', t: '还没见的人', who: '未至', body: ['有些人只是还没遇到。'], ask: '你想遇见谁？', tags: [] },
+    { id: 'c14', type: 'integration', t: '经历 × 条件', who: '成形', body: ['过去的故事，决定现在的选择。'], ask: '它们如何连成你的路？', tags: [] },
+    { id: 'c15', type: 'integration', t: '共鸣 × 未知', who: '成形', body: ['被理解的安全感，让人敢走向未知。'], ask: '你的下一步连着谁？', tags: [] },
+  ];
+  const collected = new Set(['c1', 'c2', 'c4', 'c7', 'c9', 'c14']);
+  const logEl = document.getElementById('log');
+  const log = (m) => { logEl.prepend(Object.assign(document.createElement('div'), { textContent: '· ' + m })); };
+
+  const hooks = {
+    state: { TYPE_REGION: REG, pack: { id: 'p1', q: '我该不该换一条路？', cards }, collected },
+    progress: { done: new Set(), isDone(k) { return this.done.has(k); }, complete(k) { this.done.add(k); log('✅ complete: ' + k); } },
+    effects: { burst() { log('✨ burst'); }, ripple() { log('🌊 ripple'); } },
+    bloomy: { flyTo() {}, hud: { toast: (m) => log('toast: ' + m), say: (m) => log('bloomy: ' + m) } },
+    world: { awakenPortal() { log('🚪 awakenPortal'); }, setEnergy(v) { log('⚡ energy=' + v.toFixed(2)); } },
+    engine: {
+      addLabel(el2, pos) { el2.style.left = (30 + Math.abs(pos.x || 0) * 4) + 'px'; el2.style.top = (40 + Math.abs(pos.z || 0) * 4) + 'px'; document.getElementById('fake3d').appendChild(el2); return el2; },
+      removeLabel(h) { h && h.remove && h.remove(); },
+    },
+    camera: { focusOn() {} },
+  };
+
+  let active = null;
+  function enter(key) {
+    leave();
+    const mode = MODES[key];
+    const stage = document.createElement('div');
+    stage.className = 'mode-stage';
+    stage.innerHTML = '<div class="mode-stage__head"><span class="mode-stage__title"></span><span class="mode-stage__hint"></span></div><div class="mode-stage__body"></div>';
+    stage.querySelector('.mode-stage__title').textContent = mode.title;
+    stage.querySelector('.mode-stage__hint').textContent = mode.hint;
+    document.body.appendChild(stage);
+    const anchor = { center: { x: 2, y: 0.4, z: 3 }, spots: [{ x: 0, y: 0.4, z: 1 }, { x: 3, y: 0.4, z: 3 }, { x: 1, y: 0.4, z: 6 }], land: null };
+    const regionCards = cards.filter((c) => REG[key] === c.type);
+    const pl = makePlacer();
+    const ctx = { ...hooks, stage, body: stage.querySelector('.mode-stage__body'), placer: pl, anchor, cards: regionCards,
+      done() { hooks.progress.complete(key); hooks.effects.ripple(anchor.center, '#ffd166'); hooks.bloomy.hud.toast('这一站，完成了'); } };
+    try { active = { key, dispose: mode.mount(ctx), stage, placer: pl }; log('▶ enter ' + key); }
+    catch (e) { log('❌ mount ' + key + ': ' + e.message); }
+  }
+  function makePlacer() {
+    const items = [];
+    return { place(el2, pos) { const h = hooks.engine.addLabel(el2, pos); items.push({ el: el2, h }); return h; },
+      clear() { items.forEach((it) => { hooks.engine.removeLabel(it.h || it.el); it.el.remove(); }); items.length = 0; } };
+  }
+  function leave() { if (!active) return; try { active.dispose && active.dispose(); } catch (e) { log('❌ dispose: ' + e.message); } try { active.placer && active.placer.clear(); } catch (e) { log('❌ placer: ' + e.message); } active.stage.remove(); log('■ leave ' + active.key); active = null; }
+
+  document.querySelectorAll('#side button[data-k]').forEach((b) => b.addEventListener('click', () => enter(b.dataset.k)));
+  document.getElementById('leave').addEventListener('click', leave);
+  window.addEventListener('error', (e) => log('❌ window: ' + e.message));
+  log('harness ready');
+</script>
+</body>
+</html>

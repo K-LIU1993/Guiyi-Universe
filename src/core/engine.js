@@ -185,7 +185,15 @@ export class Engine {
   onFrame(fn) { this.frameHooks.push(fn); }
 
   addLabel(el, pos) {
-    this.labels.push({ el: el, pos: pos.clone() });
+    const p = pos && pos.clone ? pos.clone() : new THREE.Vector3(pos.x, pos.y || 0, pos.z);
+    const item = { el: el, pos: p };
+    this.labels.push(item);
+    return item;
+  }
+
+  removeLabel(item) {
+    const i = this.labels.indexOf(item);
+    if (i !== -1) this.labels.splice(i, 1);
   }
 
   updateLabels() {

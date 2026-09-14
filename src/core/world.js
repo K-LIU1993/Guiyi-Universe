@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { WORLD, REGIONS } from './constants.js';
+import { WORLD, REGIONS, REGION_MAP } from './constants.js';
 import { Tweens, clamp, lerp, easeInOutCubic, deg, mulberry32 } from './utils.js';
 import { toon, GRADIENT } from './materials.js';
 import {
   islandBase, sakura, pine, bush, tuft,
   house, modernBlock, stiltHouse, billboard, signBoard,
   campfire, lanternString, portal, crystalShrine, bannerPole,
-  bridge, forkSign, rockChunk, pathStone, benchLog
+  bridge, forkSign, rockChunk, pathStone, benchLog, textTexture
 } from './geometry.js';
 
 const DECK_Y = 1.2;
@@ -98,6 +98,7 @@ export class Universe {
     this.energy = 0;
     this.portalAwake = false;
     this.portalGlow = 0;
+    this.locked = { cha: true, yu: true, wei: true };
     this.time = 0;
     this.effects = null;
 
@@ -110,7 +111,13 @@ export class Universe {
     this.scene.add(this.clouds);
 
     this.buildIslands();
+    this.buildMainland();
+    this.buildPaths();
     this.buildBridges();
+    this.buildWaterfalls();
+    this.buildEngravedWalls();
+    this.buildSakuraFrame();
+    this.buildMist();
     this.setupUpdaters();
   }
 
@@ -155,7 +162,25 @@ export class Universe {
         dir.normalize();
         land = new THREE.Vector3(pos.x + dir.x * 5.2, DECK_Y, pos.z + dir.z * 5.2);
       }
-      this.anchors[r.key] = { land: land, label: new THREE.Vector3(pos.x, 9.4, pos.z) };
+      const spots = [];
+      if (r.center) {
+        for (let si = 0; si < 3; si++) {
+          const sa2 = (si / 3) * Math.PI * 2 + 0.5;
+          spots.push(new THREE.Vector3(Math.cos(sa2) * 4.6, DECK_Y + 0.2, Math.sin(sa2) * 4.6));
+        }
+      } else {
+        const sd = new THREE.Vector3(-pos.x, 0, -pos.z).normalize();
+        const ss = new THREE.Vector3(-sd.z, 0, sd.x);
+        spots.push(new THREE.Vector3(pos.x + sd.x * 4.2, DECK_Y + 0.2, pos.z + sd.z * 4.2));
+        spots.push(new THREE.Vector3(pos.x + sd.x * 2.0 + ss.x * 3.6, DECK_Y + 0.2, pos.z + sd.z * 2.0 + ss.z * 3.6));
+        spots.push(new THREE.Vector3(pos.x + sd.x * 2.0 - ss.x * 3.6, DECK_Y + 0.2, pos.z + sd.z * 2.0 - ss.z * 3.6));
+      }
+      this.anchors[r.key] = {
+        land: land,
+        label: new THREE.Vector3(pos.x, 9.4, pos.z),
+        center: new THREE.Vector3(pos.x, DECK_Y + 1.6, pos.z),
+        spots: spots
+      };
       g.traverse((o) => {
         if (o.isMesh) { o.userData.region = r.key; this.interactives.push(o); }
       });
@@ -296,6 +321,225 @@ export class Universe {
     }
   }
 
+  buildMainland() {
+    const land = new THREE.Group();
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(62, 57.5, 2.6, 42), toon(0x5f7050));
+    top.position.y = -2.3;
+    top.receiveShadow = true;
+    land.add(top);
+    const skirt = new THREE.Mesh(new THREE.CylinderGeometry(57.5, 26, 12, 42), toon(0x443a52));
+    skirt.position.y = -8.6;
+    land.add(skirt);
+    for (const r of REGIONS) {
+      const pos = regionPos(r);
+      const ringR = r.center ? 16.5 : 15.2;
+      const ring = new THREE.Mesh(new THREE.CylinderGeometry(ringR, ringR, 0.18, 36), toon(r.center ? 0x8f7fb8 : r.grass));
+      ring.position.set(pos.x, -1.02, pos.z);
+      ring.receiveShadow = true;
+      land.add(ring);
+    }
+    const rnd = mulberry32(20260915);
+    for (let i = 0; i < 14; i++) {
+      const a = (i / 14) * Math.PI * 2 + rnd() * 0.3;
+      const d = 59 + rnd() * 3;
+      land.add(rockChunk(new THREE.Vector3(Math.cos(a) * d, -1.4, Math.sin(a) * d), 0.6 + rnd() * 1.1, 0x443a52));
+    }
+    this.scene.add(land);
+  }
+
+  buildPaths() {
+    const posOf = {};
+    for (const r of REGIONS) posOf[r.key] = regionPos(r);
+    const pairs = [['lai', 'cidi'], ['cidi', 'cha'], ['cha', 'wei'], ['wei', 'yu'], ['yu', 'lai']];
+    const g = new THREE.Group();
+    for (const p of pairs) {
+      const a = posOf[p[0]];
+      const b = posOf[p[1]];
+      const len = a.distanceTo(b);
+      const n = Math.max(2, Math.floor(len / 2.3));
+      for (let i = 1; i < n; i++) {
+        const t = i / n;
+        g.add(pathStone(new THREE.Vector3(a.x + (b.x - a.x) * t, -0.84, a.z + (b.z - a.z) * t)));
+      }
+    }
+    const arches = [['cidi', 'cha'], ['yu', 'lai']];
+    const stoneMat = toon(0x8a8a96);
+    for (const p of arches) {
+      const a = posOf[p[0]];
+      const b = posOf[p[1]];
+      const mx = (a.x + b.x) / 2;
+      const mz = (a.z + b.z) / 2;
+      const dir = new THREE.Vector3(b.x - a.x, 0, b.z - a.z).normalize();
+      const side = new THREE.Vector3(-dir.z, 0, dir.x);
+      for (const s of [-1, 1]) {
+        const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.55, 3.1, 0.55), stoneMat);
+        pillar.position.set(mx + side.x * 1.7 * s, 0.62, mz + side.z * 1.7 * s);
+        pillar.castShadow = true;
+        g.add(pillar);
+      }
+      const beam = new THREE.Mesh(new THREE.BoxGeometry(4.3, 0.5, 0.7), stoneMat);
+      beam.position.set(mx, 2.45, mz);
+      beam.rotation.y = Math.atan2(-dir.x, -dir.z);
+      beam.castShadow = true;
+      g.add(beam);
+    }
+    this.scene.add(g);
+  }
+
+  makeFallTexture() {
+    const c = document.createElement('canvas');
+    c.width = 32;
+    c.height = 128;
+    const ctx = c.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 0, 128);
+    grad.addColorStop(0, 'rgba(235,247,255,0.95)');
+    grad.addColorStop(0.55, 'rgba(150,214,255,0.8)');
+    grad.addColorStop(1, 'rgba(90,150,230,0.12)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 32, 128);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+  }
+
+  buildWaterfalls() {
+    this.fallMats = [];
+    const specs = [
+      { key: 'lai', a: 0.55, drop: 2.0 },
+      { key: 'cha', a: -0.65, drop: 2.2 },
+      { key: 'wei', a: 2.55, drop: 2.1 },
+      { key: 'cidi', a: 0.95, drop: 1.8 }
+    ];
+    const g = new THREE.Group();
+    for (const sp of specs) {
+      const pos = regionPos(REGION_MAP[sp.key]);
+      const dir = new THREE.Vector3(-pos.x, 0, -pos.z).normalize();
+      const ca = Math.cos(sp.a);
+      const sa = Math.sin(sp.a);
+      const rd = new THREE.Vector3(dir.x * ca - dir.z * sa, 0, dir.x * sa + dir.z * ca);
+      const edge = new THREE.Vector3(pos.x + rd.x * (WORLD.islandR - 0.8), 0, pos.z + rd.z * (WORLD.islandR - 0.8));
+      const h = sp.drop;
+      const mat = new THREE.MeshBasicMaterial({ map: this.makeFallTexture(), transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false });
+      const fall = new THREE.Mesh(new THREE.PlaneGeometry(2.1, h), mat);
+      fall.position.set(edge.x, 1.05 - h / 2, edge.z);
+      fall.rotation.y = Math.atan2(pos.x, pos.z);
+      g.add(fall);
+      const foam = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.55, 0.14, 18), new THREE.MeshBasicMaterial({ color: 0xdff2ff, transparent: true, opacity: 0.55, depthWrite: false }));
+      foam.position.set(edge.x, 1.1 - h, edge.z);
+      g.add(foam);
+      this.fallMats.push(mat);
+    }
+    this.scene.add(g);
+  }
+
+  makeEngravedWall(lines, w, h, pos, rotY) {
+    const g = new THREE.Group();
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.5), toon(0x3c3548));
+    slab.position.y = h / 2;
+    slab.castShadow = true;
+    g.add(slab);
+    const tex = textTexture(lines, { bg: '#3c3548', color: '#ffe9a8', subColor: '#9ad0ff', mainSize: 60, subSize: 44, w: 512, h: 192 });
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.94, h * 0.86), new THREE.MeshBasicMaterial({ map: tex }));
+    face.position.set(0, h / 2, 0.28);
+    g.add(face);
+    g.position.copy(pos);
+    g.rotation.y = rotY;
+    return g;
+  }
+
+  buildEngravedWalls() {
+    const g = new THREE.Group();
+    g.add(this.makeEngravedWall(['SAME QUESTION', 'MORE PERSPECTIVES'], 8.4, 3.0, new THREE.Vector3(14, -0.9, -13), 0.55));
+    g.add(this.makeEngravedWall(['ALL EXPERIENCES', 'MATTER'], 7.2, 2.8, new THREE.Vector3(-31, -0.9, -10), 1.25));
+    g.add(this.makeEngravedWall(['DIFFERENT VIEWS', 'A WIDER YOU'], 7.2, 2.8, new THREE.Vector3(31, -0.9, 10), -1.15));
+    this.scene.add(g);
+  }
+
+  buildSakuraFrame() {
+    const lai = regionPos(REGION_MAP.lai);
+    const dir = new THREE.Vector3(-lai.x, 0, -lai.z).normalize();
+    const base = new THREE.Vector3(lai.x + dir.x * 7.4, DECK_Y, lai.z + dir.z * 7.4);
+    const side = new THREE.Vector3(-dir.z, 0, dir.x);
+    const g = new THREE.Group();
+    g.add(sakura(new THREE.Vector3(base.x + side.x * 2.5, DECK_Y, base.z + side.z * 2.5), 1.25, 11));
+    g.add(sakura(new THREE.Vector3(base.x - side.x * 2.5, DECK_Y, base.z - side.z * 2.5), 1.25, 23));
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 5.6), toon(0xc99a5b));
+    beam.position.set(base.x, DECK_Y + 2.15, base.z);
+    beam.rotation.y = Math.atan2(side.x, side.z);
+    beam.castShadow = true;
+    g.add(beam);
+    this.scene.add(g);
+  }
+
+  makeMistPuff(x, y, z, s, color, opacity) {
+    const m = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(s, 1),
+      new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: opacity, depthWrite: false })
+    );
+    m.position.set(x, y, z);
+    m.userData.drift = Math.random() * Math.PI * 2;
+    return m;
+  }
+
+  buildMist() {
+    this.mistGroups = {};
+    const specs = [
+      { key: 'wei', color: 0x4f6b5a, n: 4, spread: 6.4, s: 3.4 },
+      { key: 'cha', color: 0x99a0b8, n: 3, spread: 5.6, s: 3.0 },
+      { key: 'yu', color: 0x99a0b8, n: 3, spread: 5.6, s: 3.0 }
+    ];
+    for (const sp of specs) {
+      const pos = regionPos(REGION_MAP[sp.key]);
+      const g = new THREE.Group();
+      for (let i = 0; i < sp.n; i++) {
+        const a = (i / sp.n) * Math.PI * 2;
+        const px = pos.x + Math.cos(a) * sp.spread * (0.5 + (i % 2) * 0.35);
+        const pz = pos.z + Math.sin(a) * sp.spread * (0.5 + (i % 2) * 0.35);
+        g.add(this.makeMistPuff(px, 1.6 + (i % 3) * 1.1, pz, sp.s * (0.75 + (i % 2) * 0.3), sp.color, 0.42));
+      }
+      g.visible = false;
+      this.scene.add(g);
+      this.mistGroups[sp.key] = g;
+    }
+  }
+
+  isLocked(key) { return this.locked[key] === true; }
+
+  setUnlocked(key, open) {
+    const was = !this.locked[key];
+    this.locked[key] = !open;
+    if (open && !was) {
+      const g = this.mistGroups[key];
+      if (g && g.visible) {
+        const puffs = [];
+        g.traverse((o) => { if (o.isMesh) puffs.push(o); });
+        this.tweens.add(1.3, (k) => {
+          for (const p of puffs) {
+            p.material.opacity = 0.42 * (1 - k);
+            p.scale.setScalar(1 + k * 0.7);
+          }
+        }, () => { g.visible = false; }, easeInOutCubic);
+      }
+      if (this.effects) {
+        const pos = regionPos(REGION_MAP[key]);
+        this.effects.spawnRipple(new THREE.Vector3(pos.x, 1.1, pos.z), 0xffd166, 2.2);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  applyLocks() {
+    for (const key in this.mistGroups) {
+      const g = this.mistGroups[key];
+      g.visible = this.locked[key] === true;
+      if (g.visible) {
+        g.traverse((o) => { if (o.isMesh) { o.material.opacity = 0.42; o.scale.setScalar(1); } });
+      }
+    }
+  }
+
   buildBridges() {
     this.bridgeGroup = new THREE.Group();
     for (const r of REGIONS) {
@@ -338,6 +582,7 @@ export class Universe {
   awakenPortal() {
     if (this.portalAwake) return false;
     this.portalAwake = true;
+    this.setUnlocked('wei', true);
     this.tweens.add(1.6, (k) => { this.portalGlow = k; });
     return true;
   }
@@ -431,6 +676,24 @@ export class Universe {
         ff.material.opacity = 0.5 + Math.sin(t * 2.8) * 0.15 + this.portalGlow * 0.35;
       });
     }
+    // 瀑布流动 + 迷雾漂移
+    const fallMats = this.fallMats;
+    const mistGroups = this.mistGroups;
+    this.updaters.push((t) => {
+      if (fallMats) {
+        for (let i = 0; i < fallMats.length; i++) {
+          fallMats[i].map.offset.y = -(t * (0.55 + i * 0.09)) % 1;
+        }
+      }
+      for (const key in mistGroups) {
+        const g = mistGroups[key];
+        if (!g.visible) continue;
+        for (const p of g.children) {
+          p.position.y += Math.sin(t * 0.6 + p.userData.drift) * 0.0035;
+          p.rotation.y = t * 0.08 + p.userData.drift;
+        }
+      }
+    });
   }
 
   update(dt) {

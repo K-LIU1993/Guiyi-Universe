@@ -16,12 +16,25 @@ export const MODES = {
   form: formIdeaWall,
 };
 
-/** 按区域筛出当前问题包的卡片。 */
-export function cardsForRegion(state, regionKey) {
-  const pack = state?.pack ?? state?.PACKS?.[0] ?? null;
-  const map = state?.TYPE_REGION ?? {};
-  if (!pack || !Array.isArray(pack.cards)) return [];
-  return pack.cards.filter((c) => map[c.type] === regionKey);
+const DEFAULT_TYPE_REGION = { story: 'lai', fact: 'cidi', view: 'cha', person: 'yu', blind: 'wei' };
+
+/** 从 hooks 中尽力解析当前问题包的全部卡片（多重兜底，适配不同宿主接线方式）。 */
+export function allCards(hooks) {
+  const s = hooks.state ?? {};
+  const pack = hooks.pack ?? s.pack ?? null;
+  if (Array.isArray(hooks.cards)) return hooks.cards;
+  if (Array.isArray(pack?.cards)) return pack.cards;
+  if (Array.isArray(s.cards)) return s.cards;
+  if (Array.isArray(hooks.PACKS?.[0]?.cards)) return hooks.PACKS[0].cards;
+  return [];
+}
+
+/** 按区域筛卡；form 没有专属卡类型，返回全部卡交由模块自行兜底。 */
+export function cardsForRegion(hooks, regionKey) {
+  const cards = allCards(hooks);
+  if (!cards.length || regionKey === 'form') return cards;
+  const map = hooks.state?.TYPE_REGION ?? hooks.TYPE_REGION ?? DEFAULT_TYPE_REGION;
+  return cards.filter((c) => map[c.type] === regionKey);
 }
 
 /** 3D 标签放置器：把 DOM 元素锚到世界坐标，统一清理。 */
@@ -81,7 +94,7 @@ export function createModes(hooks) {
         body,
         placer,
         anchor,
-        cards: cardsForRegion(hooks.state, key),
+        cards: cardsForRegion(hooks, key),
         done() {
           try { hooks.progress?.complete?.(key); } catch { /* noop */ }
           try { hooks.effects?.ripple?.(anchor.center, '#ffd166'); } catch { /* noop */ }

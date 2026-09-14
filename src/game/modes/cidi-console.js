@@ -15,7 +15,8 @@ export default {
   mount(ctx) {
     const { body, cards, placer, anchor, effects } = ctx;
     const nodes = (cards.length ? cards : GENERIC).slice(0, 3);
-    const on = [false, false, false];
+    const total = Math.max(nodes.length, 1);
+    const on = nodes.map(() => false);
     const readout = el('div', 'mode-readout', '条件待定 …');
     body.appendChild(readout);
 
@@ -46,10 +47,10 @@ export default {
       const lines = nodes.map((c, i) => on[i]
         ? '✓ 条件 ' + KEYS[i] + '：' + (c.who ? c.who + ' · ' : '') + short(c.t) + ' — ' + (c.body?.[0] ?? '')
         : '□ 条件 ' + KEYS[i] + '：未开启').join('\n');
-      readout.textContent = count < 3
-        ? lines + '\n» 还差 ' + (3 - count) + ' 个条件'
+      readout.textContent = count < total
+        ? lines + '\n» 还差 ' + (total - count) + ' 个条件'
         : lines + '\n» 条件齐了，可以拉杆汇总';
-      lever.disabled = count < 3;
+      lever.disabled = count < total;
     }
     render();
     try { placer?.place?.(el('div', 'mode-wall__tiplabel', '⚙ 条件控制台'), anchor.center); } catch { /* noop */ }

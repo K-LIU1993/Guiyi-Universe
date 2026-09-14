@@ -11,6 +11,7 @@ import * as S from './game/state.js';
 import { HUD } from './ui/hud.js';
 import { CardsUI } from './ui/cards.js';
 import { AnswerUI } from './ui/answer.js';
+import { createModes } from './game/modes/index.js';
 
 // Bloomy 的六岛深一层解说
 const EXPLAIN = {
@@ -40,6 +41,52 @@ let state = null;
 let pack = null;
 let current = null;
 let generating = false;
+let modes = null;
+const modesDone = new Set();
+const stateBridge = {};
+
+// 解锁阶段:完成任意一处探索后点亮岔路与遇见;两处之后迷雾散开、未至显现
+const STAGE2 = ['cha', 'yu'];
+
+function progressOf(s) {
+  if (!s.progress) s.progress = {};
+  return s.progress;
+}
+
+function completedCount(s) {
+  const p = progressOf(s);
+  let n = 0;
+  for (const k in p) { if (p[k]) n++; }
+  return n;
+}
+
+function maybeUnlock() {
+  if (!state || !universe) return;
+  const done = completedCount(state);
+  for (const k of STAGE2) {
+    if (done >= 1 && universe.isLocked(k)) {
+      universe.setUnlocked(k, true);
+      hud.toast('✦ 区域点亮 · ' + REGION_MAP[k].name);
+    }
+  }
+  if ((done >= 2 || S.portalReady(state)) && universe.isLocked('wei')) {
+    if (universe.awakenPortal()) {
+      hud.toast('✦ 迷雾散去 · 未至岛向你打开');
+      bloomy.say('portal', true);
+    }
+  }
+  S.saveState(state);
+}
+
+function getAnchor(key) {
+  const a = universe.anchors[key];
+  if (!a) return null;
+  return {
+    center: { x: a.center.x, y: a.center.y, z: a.center.z },
+    spots: a.spots.map((p) => ({ x: p.x, y: p.y, z: p.z })),
+    land: a.land.clone()
+  };
+}
 
 function qText() { return (state && state.q) || (pack ? pack.q : ''); }
 
@@ -88,11 +135,29 @@ function openDrawerFor(key) {
   cardsUI.openDrawer(REGION_MAP[key], cards);
 }
 
+function completeIsland(key) {
+  if (modesDone.has(key)) return;
+  modesDone.add(key);
+  progressOf(state)[key] = true;
+  const cards = (pack ? pack.cards : []).filter((c) => S.TYPE_REGION[c.type] === key);
+  for (const c of cards) onCollect(c);
+  S.saveState(state);
+  maybeUnlock();
+  if (key === 'wei') { try { universe.awakenPortal(); } catch (err) { /* noop */ } }
+}
+
 function startGenerating() {
   generating = true;
   hud.showGenerating(qText());
   engine.rig.reset();
-  universe.rise(() => enterWorld());
+  engine.rig.dTarget.set(0, 7, 0);
+  engine.rig.dRadius = 24;
+  engine.rig.dTheta = 0.35;
+  universe.rise(() => {
+    engine.rig.dTarget.set(0, 2, 0);
+    engine.rig.dRadius = 62;
+    enterWorld();
+  });
 }
 
 function onStart(packId, customQ) {
@@ -100,6 +165,8 @@ function onStart(packId, customQ) {
   state = S.createState(packId);
   state.q = customQ || pack.q;
   S.saveState(state);
+  stateBridge.pack = pack;
+  stateBridge.TYPE_REGION = S.TYPE_REGION;
   hud.hideIntro();
   hud.setQuestion(state.q);
   startGenerating();
@@ -110,6 +177,8 @@ function onContinue() {
   if (!saved) { hud.showIntro(null); return; }
   state = saved;
   pack = getPack(state.packId);
+  stateBridge.pack = pack;
+  stateBridge.TYPE_REGION = S.TYPE_REGION;
   hud.hideIntro();
   hud.setQuestion(qText());
   startGenerating();
@@ -138,6 +207,11 @@ function enterWorld() {
   bloomy.place(universe.anchors.form.land.clone());
   bloomy.celebrate();
   bloomy.say('hello');
+  const pr = progressOf(state);
+  if (pr.cha) universe.locked.cha = false;
+  if (pr.yu) universe.locked.yu = false;
+  if (pr.wei) { universe.locked.wei = false; universe.portalAwake = true; universe.portalGlow = 1; }
+  universe.applyLocks();
   hud.setStep(S.currentStep(state));
   hud.setVisited(state.visited);
   for (const r of REGIONS) hud.setTagCount(r.key, S.regionCount(state, r.key));
@@ -149,7 +223,8 @@ function enterWorld() {
 function travel(key) {
   if (generating || !state || bloomy.flying) return;
   if (key === current) {
-    if (key !== 'form' && key !== 'wei') openDrawerFor(key);
+    if (modes && modes.has(key) && key !== 'form') modes.enter(key, universe.anchors[key]);
+    else if (key !== 'form' && key !== 'wei') openDrawerFor(key);
     return;
   }
   if (key === 'wei' && !S.portalReady(state)) {
@@ -157,9 +232,16 @@ function travel(key) {
     hud.toast('传送门未点亮 · 先走完 来路 / 此地 / 岔路');
     return;
   }
+  if (universe.isLocked(key)) {
+    bloomy.say('locked', true);
+    hud.toast(REGION_MAP[key].name + '还在雾里 · 先在一处把探索做完，它自然会亮');
+    return;
+  }
+  if (modes) modes.leave();
   current = key;
   cardsUI.closeAll();
   answerUI.close();
+  if (modes) modes.leave();
   const land = universe.anchors[key].land.clone();
   bloomy.flyTo(land, () => onArrive(key));
   const pos = universe.islands[key].position;
@@ -185,6 +267,7 @@ function onArrive(key) {
   for (const r of REGIONS) hud.setTagCount(r.key, S.regionCount(state, r.key));
   hud.setStep(S.currentStep(state));
   unlockToasts();
+  maybeUnlock();
   if (key === 'form') {
     if (state.answer) {
       answerUI.showAnswer(state.answer, qText(), stats(), pack);
@@ -194,7 +277,8 @@ function onArrive(key) {
       hud.toast('成形条件未满足 · 还差：' + missingText());
     }
   } else {
-    openDrawerFor(key);
+    if (modes && modes.has(key)) modes.enter(key, universe.anchors[key]);
+    else openDrawerFor(key);
   }
 }
 
@@ -214,7 +298,6 @@ function onCollect(card) {
   hud.toast('收下 · ' + card.t);
   hud.setStep(S.currentStep(state));
   hud.setFormAvailable(S.formReady(state) && !state.answer);
-  if (current && current !== 'form') openDrawerFor(current);
 }
 
 function onMark(cardId, mood) {
@@ -279,6 +362,7 @@ function onForm() {
   }
   current = 'form';
   cardsUI.closeAll();
+  if (modes) modes.leave();
   const land = universe.anchors.form.land.clone();
   bloomy.flyTo(land, null);
   const pos = universe.islands.form.position;
@@ -334,6 +418,32 @@ function boot() {
     () => collectedCards()
   );
   answerUI = new AnswerUI({ onSubmit: onSubmit, onNewUniverse: onNewUniverse });
+
+  modes = createModes({
+    get state() { return state; },
+    TYPE_REGION: S.TYPE_REGION,
+    get cards() { return pack ? pack.cards : []; },
+    world: universe,
+    engine: engine,
+    camera: engine.rig,
+    bloomy: bloomy,
+    effects: {
+      burst(pos, color) {
+        try {
+          const p = pos || bloomy.group.position;
+          const hex = new THREE.Color(color).getHex();
+          effects.spawnBurst(new THREE.Vector3(p.x, (p.y || 0) + 1.2, p.z), hex, 30, 4, 3);
+        } catch (err) { /* noop */ }
+      },
+      ripple(pos, color) {
+        try { effects.spawnRipple(pos, new THREE.Color(color).getHex(), 1.2); } catch (err) { /* noop */ }
+      }
+    },
+    progress: {
+      isDone: (k) => modesDone.has(k),
+      complete: (k) => completeIsland(k)
+    }
+  });
 
   for (const r of REGIONS) {
     const el = hud.createTag(r);

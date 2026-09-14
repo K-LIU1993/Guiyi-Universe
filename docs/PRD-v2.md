@@ -43,6 +43,8 @@
 hooks 结构（所有字段均可选，模块内部做了防御）：
 
 - state：当前问题包状态（pack / TYPE_REGION）
+- cards（可选）：当前问题包卡片数组；缺省时运行时按 state.pack.cards → state.cards 兜底，
+  区域映射缺省用内置 { story:lai, fact:cidi, view:cha, person:yu, blind:wei }，form 岛拿全量卡
 - progress：{ isDone(key), complete(key) }
 - world：Universe（tweens / setEnergy / awakenPortal / interactives）
 - engine：addLabel(el,pos) / removeLabel(handle)

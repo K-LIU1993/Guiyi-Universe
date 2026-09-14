@@ -2,7 +2,7 @@
 .mode-stage {
   position: fixed;
   right: 18px;
-  bottom: 96px;
+  bottom: 150px;
   width: min(360px, calc(100vw - 36px));
   max-height: min(62vh, 520px);
   display: flex;
@@ -99,12 +99,12 @@
 }
 .mode-fork__sign--right { transform: rotate(14deg); }
 .mode-fork__arm {
-  position: absolute; top: 12px; padding: 4px 10px; border-radius: 8px; font-size: 12px;
+  position: absolute; padding: 4px 10px; border-radius: 8px; font-size: 12px;
   border: 2px solid #e2604f; background: rgba(226, 96, 79, 0.16); white-space: nowrap;
 }
-.mode-fork__arm--left { left: -6px; transform: rotate(-6deg); }
-.mode-fork__arm--right { right: -6px; transform: rotate(6deg); }
-.mode-fork__pole { position: absolute; left: 50%; top: 30px; width: 5px; height: 42px; background: #a8795a; border-radius: 3px; transform: translateX(-50%); }
+.mode-fork__arm--left { left: -6px; top: 6px; transform: rotate(-6deg); }
+.mode-fork__arm--right { right: -6px; top: 38px; transform: rotate(6deg); }
+.mode-fork__pole { position: absolute; left: 50%; top: 22px; width: 5px; height: 46px; background: #a8795a; border-radius: 3px; transform: translateX(-50%); }
 .mode-fork__path { width: 100%; }
 .mode-fork__walk { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden; }
 .mode-fork__walk i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ffd166, #e2604f); transition: width 1.6s linear; }
