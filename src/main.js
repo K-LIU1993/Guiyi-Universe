@@ -7,6 +7,7 @@ import { REGIONS, REGION_MAP, EXPLORE_KEYS } from './core/constants.js';
 import { pick } from './core/utils.js';
 import { Bloomy } from './game/bloomy.js';
 import { getPack } from './game/content.js';
+import { generatePack } from './game/personalize.js';
 import * as S from './game/state.js';
 import { HUD } from './ui/hud.js';
 import { CardsUI } from './ui/cards.js';
@@ -161,8 +162,14 @@ function startGenerating() {
 }
 
 function onStart(packId, customQ) {
-  pack = getPack(packId);
-  state = S.createState(packId);
+  // 输入恰好等于预设问题时直接用预设包，保证再次进入内容一致
+  if (customQ && customQ !== getPack(packId).q) {
+    pack = generatePack(customQ);
+    state = S.createState('custom');
+  } else {
+    pack = getPack(packId);
+    state = S.createState(packId);
+  }
   state.q = customQ || pack.q;
   S.saveState(state);
   stateBridge.pack = pack;
@@ -176,7 +183,9 @@ function onContinue() {
   const saved = S.loadState();
   if (!saved) { hud.showIntro(null); return; }
   state = saved;
-  pack = getPack(state.packId);
+  // 存档恢复：自定义问题（或 q 与预设包不符的旧存档）按问题确定性重建宇宙
+  const base = getPack(state.packId);
+  pack = (state.q && base && state.q !== base.q) ? generatePack(state.q) : base;
   stateBridge.pack = pack;
   stateBridge.TYPE_REGION = S.TYPE_REGION;
   hud.hideIntro();

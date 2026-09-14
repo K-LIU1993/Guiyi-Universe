@@ -278,7 +278,7 @@ export class HUD {
     }
     const row = this.el('div', 'intro-input', card);
     this.input = this.el('input', '', row);
-    this.input.placeholder = '写下你自己的问题……';
+    this.input.placeholder = '写下你自己的问题，宇宙会为它单独生成……';
     this.input.maxLength = 40;
     const ask = this.el('button', 'btn', row, '造一个宇宙');
     const actions = this.el('div', 'intro-actions', card);
