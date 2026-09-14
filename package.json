@@ -1,0 +1,18 @@
+{
+  "name": "guiyi-universe",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "归一 · 一问一世界 — 基于 Three.js 的 3D 知识探索宇宙 Demo",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}
