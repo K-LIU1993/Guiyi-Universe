@@ -335,3 +335,16 @@ body.quiet .radial .rd-item { animation: none; }
   .cmp-grid { grid-template-columns: 1fr; }
   .actionbar { bottom: 12px; }
 }
+.q-origin {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #ffd166;
+  opacity: .9;
+}
+.demo-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+.demo-choice { text-align: left; }

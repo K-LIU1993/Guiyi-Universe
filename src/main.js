@@ -9,6 +9,8 @@ import { Bloomy } from './game/bloomy.js';
 import { getPack } from './game/content.js';
 import { generatePack } from './game/personalize.js';
 import * as S from './game/state.js';
+import { requestWorldPack, requestIslandAdapt } from './game/worldClient.js';
+import { packOrigin, buildPriorChoices, normalizeDeclaredPlan } from './game/adaptive.js';
 import { HUD } from './ui/hud.js';
 import { CardsUI } from './ui/cards.js';
 import { AnswerUI } from './ui/answer.js';
@@ -43,6 +45,7 @@ let pack = null;
 let current = null;
 let generating = false;
 let modes = null;
+let startSeq = 0;
 const modesDone = new Set();
 const stateBridge = {};
 
@@ -161,35 +164,94 @@ function startGenerating() {
   });
 }
 
-function onStart(packId, customQ) {
-  // 输入恰好等于预设问题时直接用预设包，保证再次进入内容一致
-  if (customQ && customQ !== getPack(packId).q) {
-    pack = generatePack(customQ);
-    state = S.createState('custom');
-  } else {
-    pack = getPack(packId);
-    state = S.createState(packId);
-  }
-  state.q = customQ || pack.q;
-  S.saveState(state);
+function onStart(question) {
+  return onStartQuestion(null, question);
+}
+
+function applyPack(nextPack, origin) {
+  pack = nextPack;
+  state = S.createState(pack.id);
+  state.q = pack.q;
+  state.pack = pack;
+  state.packOrigin = origin;
   stateBridge.pack = pack;
   stateBridge.TYPE_REGION = S.TYPE_REGION;
-  hud.hideIntro();
+  S.saveState(state);
   hud.setQuestion(state.q);
+  hud.setPackOrigin(packOrigin(pack, origin).text);
+}
+
+async function onStartQuestion(unusedPackId, customQ) {
+  const seq = ++startSeq;
+  const q = String(customQ || '').trim();
+  if (!q) {
+    hud.showDemoChooser((choice) => { startDemo(choice); });
+    return;
+  }
+  hud.hideIntro();
+  hud.hideWorldError();
+  hud.hideDemoChooser();
+  hud.setQuestion(q);
+  hud.setPackOrigin('生成中 · 服务端 LLM + 知乎检索…');
+  hud.setStartBusy(true);
+  generating = true;
+  hud.showGenerating(q);
+  try {
+    const { pack: nextPack, warnings } = await requestWorldPack(q);
+    if (seq !== startSeq) return;
+    applyPack(nextPack, 'api');
+    for (const w of warnings || []) hud.toast('提示 · ' + w);
+    startGenerating();
+  } catch (err) {
+    if (seq !== startSeq) return;
+    generating = false;
+    hud.hideGenerating();
+    hud.setPackOrigin('');
+    hud.showWorldError(err && err.message ? err.message : '生成服务暂时不可用。', {
+      onRetry: () => { onStart(q); },
+      onDemo: () => { hud.showDemoChooser((choice) => { startDemo(choice); }); },
+      onDismiss: () => { hud.showIntro(null); }
+    });
+  } finally {
+    if (seq === startSeq) hud.setStartBusy(false);
+  }
+}
+
+function startDemo(choice) {
+  const mode = choice && choice.mode;
+  let nextPack;
+  if (mode === 'preset') {
+    nextPack = getPack(choice.packId);
+  } else if (choice && typeof choice.question === 'string' && choice.question.trim()) {
+    nextPack = generatePack(choice.question.trim());
+  } else {
+    nextPack = getPack('paint');
+  }
+  hud.hideIntro();
+  hud.hideWorldError();
+  applyPack(nextPack, 'local-demo');
   startGenerating();
 }
 
 function onContinue() {
+  const seq = ++startSeq;
   const saved = S.loadState();
   if (!saved) { hud.showIntro(null); return; }
   state = saved;
-  // 存档恢复：自定义问题（或 q 与预设包不符的旧存档）按问题确定性重建宇宙
-  const base = getPack(state.packId);
-  pack = (state.q && base && state.q !== base.q) ? generatePack(state.q) : base;
+  if (S.storedPackUsable(state.pack)) {
+    pack = state.pack;
+  } else {
+    const base = getPack(state.packId);
+    pack = (state.q && base && state.q !== base.q) ? generatePack(state.q) : base;
+    state.pack = pack;
+    state.packOrigin = 'legacy';
+    S.saveState(state);
+  }
   stateBridge.pack = pack;
   stateBridge.TYPE_REGION = S.TYPE_REGION;
   hud.hideIntro();
   hud.setQuestion(qText());
+  hud.setPackOrigin(packOrigin(pack, state.packOrigin).text);
   startGenerating();
 }
 
@@ -221,6 +283,7 @@ function enterWorld() {
   if (pr.yu) universe.locked.yu = false;
   if (pr.wei) { universe.locked.wei = false; universe.portalAwake = true; universe.portalGlow = 1; }
   universe.applyLocks();
+  maybeUnlock();
   hud.setStep(S.currentStep(state));
   hud.setVisited(state.visited);
   for (const r of REGIONS) hud.setTagCount(r.key, S.regionCount(state, r.key));
@@ -281,7 +344,7 @@ function onArrive(key) {
     if (state.answer) {
       answerUI.showAnswer(state.answer, qText(), stats(), pack);
     } else if (S.formReady(state)) {
-      answerUI.openComposer(qText(), collectedCards());
+      answerUI.openComposer(qText(), collectedCards(), pack.islandPlans?.form, pack.sources || []);
     } else {
       hud.toast('成形条件未满足 · 还差：' + missingText());
     }
@@ -356,7 +419,9 @@ function onRadial(act) {
     if (state.collected.length < 2) { hud.toast('先收下两张卡，再上对照桌'); return; }
     cardsUI.openCompare(null);
   } else if (act === 'next') {
-    travel(suggestNext());
+    const nxt = suggestNext();
+    if (nxt === 'cha' && state.compares.length < 1) hud.toast('对照还欠一次 · 岔路收卡后点 Bloomy → ⚖️ 比较观点');
+    travel(nxt);
   } else if (act === 'reask') {
     hud.say(pick(REASKS), 9000);
   }
@@ -378,11 +443,13 @@ function onForm() {
   engine.rig.focusOn(pos.x, pos.z, 38);
   effects.spawnRipple(land, REGION_MAP.form.three, 1.2);
   hud.setCurrent('form');
-  answerUI.openComposer(qText(), collectedCards());
+  answerUI.openComposer(qText(), collectedCards(), pack.islandPlans?.form, pack.sources || []);
 }
 
 function onSubmit(data) {
   if (!state) return;
+  if (!state.regionChoices) state.regionChoices = {};
+  state.regionChoices.form = ['成形依据：' + data.picks.map(id => S.cardById(pack, id)?.t || id).join('、')];
   state.answer = {
     picks: data.picks,
     text: data.text,
@@ -398,6 +465,26 @@ function onSubmit(data) {
   hud.setFormAvailable(false);
   unlockToasts();
   answerUI.showAnswer(state.answer, qText(), stats(), pack);
+}
+
+async function replanForm(pickedIds) {
+  const currentState = state;
+  const currentPack = pack;
+  const titleOf = id => S.cardById(currentPack, id)?.t || id;
+  const priorChoices = [
+    '成形窗口已选依据：' + (pickedIds || []).map(titleOf).join('、'),
+    ...buildPriorChoices(currentState, 'form', titleOf)
+  ];
+  const result = await requestIslandAdapt({ question: currentPack.q, region: 'form', cards: currentPack.cards, priorChoices });
+  if (state !== currentState || pack !== currentPack) throw new Error('问题已切换，本次结果未应用');
+  const nextPlan = normalizeDeclaredPlan(result.plan, currentPack.cards);
+  if (!nextPlan) throw new Error('返回的整合计划无效');
+  nextPlan.source = 'llm';
+  nextPlan.online = true;
+  if (!currentPack.islandPlans) currentPack.islandPlans = {};
+  currentPack.islandPlans.form = nextPlan;
+  S.saveState(currentState);
+  return nextPlan;
 }
 
 function boot() {
@@ -419,21 +506,26 @@ function boot() {
     onForm: onForm,
     onRadial: onRadial
   });
+  bloomy.hud = hud;
   bloomy.onSay = (t) => hud.say(t);
 
   cardsUI = new CardsUI(
     { onCollect: onCollect, onMark: onMark, onCompareStart: onCompareStart, onCompareConfirm: onCompareConfirm },
     () => state,
-    () => collectedCards()
+    () => collectedCards(),
+    () => (pack && Array.isArray(pack.sources) ? pack.sources : [])
   );
   answerUI = new AnswerUI({
     onSubmit: onSubmit,
+    onReplanForm: replanForm,
     onNewUniverse: onNewUniverse,
-    onFlyBack: () => hud.toast('📮 问题已飞回入口 · 下一位旅人会在入口遇见它')
+    onFlyBack: () => hud.toast('📮 问题已存入本浏览器的漂流池 · 只会在你下次打开时的入口浮现')
   });
 
   modes = createModes({
     get state() { return state; },
+    get pack() { return pack; },
+    save: () => S.saveState(state),
     TYPE_REGION: S.TYPE_REGION,
     get cards() { return pack ? pack.cards : []; },
     world: universe,

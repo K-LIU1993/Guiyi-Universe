@@ -1,4 +1,7 @@
 // 六岛专属交互模式：注册表与运行时。宿主通过 createModes(hooks) 接入。
+import { planForRegion, normalizeDeclaredPlan, buildPriorChoices } from '../adaptive.js';
+import { requestIslandAdapt } from '../worldClient.js';
+import { renderPlanBar } from '../../ui/evidence.js';
 import laiTrail from './lai-trail.js';
 import cidiConsole from './cidi-console.js';
 import chaFork from './cha-fork.js';
@@ -59,6 +62,54 @@ function makePlacer(hooks) {
 
 export function createModes(hooks) {
   let active = null;
+  let islandSeq = 0;
+
+  function makeAdaptButton(key, ctx) {
+    const b = document.createElement('button');
+    b.className = 'plan-adapt-btn';
+    b.type = 'button';
+    b.textContent = '🔄 在线重规划';
+    b.title = '请求服务端 LLM 结合你的进度，为当前岛重新生成引导（可选，失败时保留本地引导）';
+    b.addEventListener('click', async () => {
+      if (b.disabled || !hooks.pack) return;
+      b.disabled = true;
+      b.textContent = '在线重规划中…';
+      const seq = islandSeq;
+      try {
+        const st = hooks.state || {};
+        const titleOf = (id) => {
+          for (const c of hooks.pack.cards || []) {
+            if (c && c.id === id) return '「' + (c.t || id) + '」';
+          }
+          return id;
+        };
+        const res = await requestIslandAdapt({
+          question: hooks.pack.q,
+          region: key,
+          cards: ctx.cards,
+          priorChoices: buildPriorChoices(st, key, titleOf)
+        });
+        if (seq !== islandSeq) {
+          hooks.bloomy?.hud?.toast?.('已离开本岛 · 过期的重规划结果已忽略');
+          return;
+        }
+        const declared = normalizeDeclaredPlan(res.plan, key === 'form' ? (hooks.pack.cards || []) : ctx.cards);
+        if (!declared) throw new Error('plan empty');
+        declared.source = 'llm';
+        declared.online = true;
+        ctx.setPlan(declared);
+        hooks.bloomy?.hud?.toast?.('LLM 已按你的进度重写本岛引导');
+    } catch (err) {
+      hooks.bloomy?.hud?.toast?.('在线适配不可用 · 保留本包/规则引导');
+    } finally {
+      if (seq === islandSeq) {
+        b.disabled = false;
+        b.textContent = '🔄 在线重规划';
+      }
+      }
+    });
+    return b;
+  }
 
   function ensureStage(key, mode) {
     if (typeof hooks.ui?.createStage === 'function') {
@@ -87,20 +138,59 @@ export function createModes(hooks) {
       if (!mode || !anchor) return false;
       const stage = ensureStage(key, mode);
       const placer = makePlacer(hooks);
-      const body = stage.querySelector?.('.mode-stage__body') ?? stage;
-      const ctx = {
-        ...hooks,
-        stage,
-        body,
-        placer,
-        anchor,
-        cards: cardsForRegion(hooks, key),
-        done() {
+    const body = stage.querySelector?.('.mode-stage__body') ?? stage;
+    const plan = planForRegion(hooks.pack, key, hooks.state);
+    const sources = hooks.pack && Array.isArray(hooks.pack.sources) ? hooks.pack.sources : [];
+    const planBar = document.createElement('div');
+    planBar.className = 'plan-bar';
+    renderPlanBar(planBar, plan);
+    const planListeners = [];
+    const ctx = {
+      ...hooks,
+      stage,
+      body,
+      placer,
+      anchor,
+      cards: cardsForRegion(hooks, key),
+      sources,
+      plan,
+      planBar,
+      onPlanChange(fn) {
+        if (typeof fn === 'function') planListeners.push(fn);
+      },
+      recordChoice(text) {
+        const st = hooks.state;
+        const t = typeof text === 'string' ? text.trim() : '';
+        if (!st || !t) return;
+        if (!st.regionChoices || typeof st.regionChoices !== 'object' || Array.isArray(st.regionChoices)) st.regionChoices = {};
+        const arr = Array.isArray(st.regionChoices[key]) ? st.regionChoices[key] : [];
+        arr.push(t);
+        st.regionChoices[key] = arr.slice(-12);
+        try { hooks.save?.(); } catch { }
+      },
+      setPlan(nextPlan) {
+        ctx.plan = nextPlan;
+        renderPlanBar(planBar, nextPlan);
+        planBar.appendChild(adaptBtn);
+        const st = hooks.state;
+        if (st && st.pack === hooks.pack) {
+          if (!st.pack.islandPlans || typeof st.pack.islandPlans !== 'object') st.pack.islandPlans = {};
+          st.pack.islandPlans[key] = nextPlan;
+          try { hooks.save?.(); } catch { }
+        }
+        for (const fn of planListeners) {
+          try { fn(nextPlan); } catch { }
+        }
+      },
+      done() {
           try { hooks.progress?.complete?.(key); } catch { /* noop */ }
           try { hooks.effects?.ripple?.(anchor.center, '#ffd166'); } catch { /* noop */ }
           try { hooks.bloomy?.hud?.toast?.('这一站，完成了'); } catch { /* noop */ }
         },
       };
+      const adaptBtn = makeAdaptButton(key, ctx);
+      if (hooks.pack) planBar.appendChild(adaptBtn);
+      body.appendChild(planBar);
       let dispose = null;
       try { dispose = mode.mount(ctx) ?? null; }
       catch (err) { console.warn('[modes] mount failed:', key, err); }

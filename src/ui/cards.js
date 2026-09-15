@@ -1,5 +1,6 @@
 // 卡片抽屉 · 阅读器 · 对照桌
 import { TYPE_META } from '../game/content.js';
+import { sourceRefsEl } from './evidence.js';
 
 const VERDICTS = [
   ['a', '我更信左边'],
@@ -11,10 +12,11 @@ const VERDICTS = [
 const MOODS = [['agree', '认同'], ['doubt', '存疑'], ['wow', '惊讶']];
 
 export class CardsUI {
-  constructor(cb, getState, getCollected) {
+  constructor(cb, getState, getCollected, getSources) {
     this.cb = cb;
     this.getState = getState;
     this.getCollected = getCollected;
+    this.getSources = getSources || (() => []);
     this.drawerEl = null;
     this.readerEl = null;
     this.compareEl = null;
@@ -96,9 +98,15 @@ export class CardsUI {
       const pe = this.el('div', '', body);
       pe.textContent = p;
     }
-    this.el('div', 'cr-ask', m, '✦ ' + card.ask);
+    const askEl = this.el('div', 'cr-ask', m);
+    askEl.textContent = '✦ ' + (card.ask || '');
     const tags = this.el('div', 'cr-tags', m);
-    for (const tg of card.tags) this.el('span', '', tags, tg);
+    for (const tg of card.tags) {
+      const ts = this.el('span', '', tags);
+      ts.textContent = tg;
+    }
+    const refs = sourceRefsEl(card, this.getSources());
+    if (refs) m.appendChild(refs);
 
     const st = this.getState();
     const actions = this.el('div', 'cr-actions', m);

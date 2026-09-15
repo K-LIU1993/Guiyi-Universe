@@ -1,5 +1,6 @@
 // 成形 · 关联壁：把收集到的卡片围住水晶球，两两连线并命名关系，织成思路网。
 import { el, esc, short } from './util.js';
+import { completionText } from '../../ui/evidence.js';
 
 const REL = ['相互印证', '彼此张力', '层层递进'];
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -21,6 +22,25 @@ export default {
     wall.appendChild(svg);
     wall.appendChild(el('div', 'mode-wall__core', '❓'));
     body.appendChild(wall);
+
+    let relHintsBox = null;
+    function renderRelHints() {
+      if (relHintsBox) { relHintsBox.remove(); relHintsBox = null; }
+      const hints = Array.isArray(ctx.plan?.relHints) ? ctx.plan.relHints : [];
+      if (!hints.length) return;
+      const box = el('div', 'mode-relhints');
+      const h = el('div', 'mode-relhints__title');
+      h.textContent = '这些关系，值得先连：';
+      box.appendChild(h);
+      for (const hint of hints) {
+        const item = el('div', 'mode-relhints__item');
+        item.textContent = '· ' + hint;
+        box.appendChild(item);
+      }
+      body.appendChild(box);
+    }
+    renderRelHints();
+    ctx.onPlanChange?.(renderRelHints);
 
     const chips = use.map((card, i) => {
       const a = (i / Math.max(use.length, 1)) * Math.PI * 2 - Math.PI / 2;
@@ -67,6 +87,7 @@ export default {
       REL.forEach((r) => {
         const bt = el('button', 'mode-btn mode-btn--ghost', r);
         bt.addEventListener('click', () => {
+          ctx.recordChoice?.('连线「' + l.a.textContent + '×' + l.b.textContent + '」=' + r);
           l.rel = r;
           l.labelEl = el('div', 'mode-wall__tiplabel', esc(r));
           wall.appendChild(l.labelEl);
@@ -84,7 +105,7 @@ export default {
       if (doneFlag || links.filter((l) => l.rel).length < 2) return;
       doneFlag = true;
       wall.querySelector('.mode-wall__core').textContent = '💡';
-      body.appendChild(el('div', 'mode-done', '✦ 思路成网 · 成形已连接'));
+      body.appendChild(el('div', 'mode-done', completionText(ctx.plan, '✦ 思路成网 · 成形已连接')));
       try { effects?.burst?.(anchor.center, '#ffd166'); } catch { /* noop */ }
       try { world?.setEnergy?.(Math.min(1, (world?.energy ?? 0) + 0.2)); } catch { /* noop */ }
       ctx.done();

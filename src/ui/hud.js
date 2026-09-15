@@ -1,6 +1,7 @@
 // HUD：开场、顶栏、气泡、小地图、径向菜单、提示与音效
 import { REGIONS, REGION_MAP } from '../core/constants.js';
 import { pickEntryChips } from '../game/questionPool.js';
+import { PACKS } from '../game/content.js';
 
 // 极简 WebAudio：环境垫音 + 操作 blip
 export class Sfx {
@@ -94,6 +95,8 @@ export class HUD {
     const q = this.el('div', 'q-sticker panel', bar);
     this.el('div', 'q-label', q, '当前问题 · QUESTION');
     this.qText = this.el('div', 'q-text', q, '……');
+    this.qOrigin = this.el('div', 'q-origin', q);
+    this.qOrigin.style.display = 'none';
     const right = this.el('div', 'hud-right', bar);
     const steps = this.el('div', 'steps panel', right);
     this.stepEls = [];
@@ -228,6 +231,66 @@ export class HUD {
 
   hideGenerating() { this.genEl.classList.add('fadeout'); setTimeout(() => { this.genEl.style.display = 'none'; this.genEl.classList.remove('fadeout'); }, 750); }
 
+  setStartBusy(busy) {
+    if (this.startBtn) { this.startBtn.disabled = busy; this.startBtn.textContent = busy ? '生成中…' : '开始探索 →'; }
+    if (this.askBtn) this.askBtn.disabled = busy;
+  }
+
+  setPackOrigin(text) {
+    if (!this.qOrigin) return;
+    if (text) { this.qOrigin.textContent = text; this.qOrigin.style.display = ''; }
+    else { this.qOrigin.textContent = ''; this.qOrigin.style.display = 'none'; }
+  }
+
+  showWorldError(msg, actions) {
+    this.hideWorldError();
+    const bg = this.el('div', 'modal-bg', this.ui);
+    this.worldErrEl = bg;
+    const m = this.el('div', 'modal panel', bg);
+    const x = this.el('button', 'modal-close', m, '×');
+    this.el('div', 'help-title', m, '生成没有成功');
+    const line = this.el('div', 'help-list', m);
+    line.textContent = String(msg || '生成服务暂时不可用。') + ' 这不影响你本地已有的存档。';
+    const row = this.el('div', 'intro-actions', m);
+    const retry = this.el('button', 'btn primary', row, '重试生成');
+    const demo = this.el('button', 'btn ghost', row, '改用本地演示内容…');
+    retry.addEventListener('click', () => { const f = actions && actions.onRetry; this.hideWorldError(); if (f) f(); });
+    demo.addEventListener('click', () => { const f = actions && actions.onDemo; this.hideWorldError(); if (f) f(); });
+    x.addEventListener('click', () => this.hideWorldError());
+    bg.addEventListener('click', (e) => { if (e.target === bg) this.hideWorldError(); });
+  }
+
+  hideWorldError() { if (this.worldErrEl) { this.worldErrEl.remove(); this.worldErrEl = null; } }
+
+  showDemoChooser(onPick) {
+    this.hideDemoChooser();
+    const bg = this.el('div', 'modal-bg', this.ui);
+    this.demoEl = bg;
+    const m = this.el('div', 'modal panel', bg);
+    const x = this.el('button', 'modal-close', m, '×');
+    this.el('div', 'help-title', m, '选择本地演示内容');
+    const list = this.el('div', 'help-list', m);
+    const note = this.el('div', '', list);
+    note.textContent = '在线生成暂不可用。以下为预先打磨的本地演示包，或按你输入的问题本地规则生成（非 LLM）。';
+    const row = this.el('div', 'demo-choices', m);
+    for (const p of PACKS) {
+      const b = this.el('button', 'btn ghost demo-choice', row);
+      b.textContent = (p.sub ? p.sub + ' · ' : '') + p.q;
+      b.addEventListener('click', () => { this.hideDemoChooser(); onPick({ mode: 'preset', packId: p.id }); });
+    }
+    const rule = this.el('button', 'btn ghost demo-choice', row);
+    rule.textContent = '用我的问题本地生成（规则版，非 LLM）';
+    rule.addEventListener('click', () => {
+      const q = this.input ? this.input.value.trim() : '';
+      this.hideDemoChooser();
+      onPick({ mode: 'rule', question: q });
+    });
+    x.addEventListener('click', () => this.hideDemoChooser());
+    bg.addEventListener('click', (e) => { if (e.target === bg) this.hideDemoChooser(); });
+  }
+
+  hideDemoChooser() { if (this.demoEl) { this.demoEl.remove(); this.demoEl = null; } }
+
   buildHelp() {
     this.helpBg = this.el('div', 'modal-bg', this.ui);
     this.helpBg.style.display = 'none';
@@ -241,7 +304,8 @@ export class HUD {
       '<div><b>4 遇见</b>：去遇见岛，听真实的人讲话。共鸣比观点更接近理解。</div>' +
       '<div><b>5 成形</b>：走够四个方向、见过他者、做过对照之后，中央岛为你打开。写下属于你的答案。</div>' +
       '<div>🌱 <b>Bloomy</b> 是你的同伴，点击它随时可以让它解释、比较、带路，或换个问法。</div>' +
-      '<div>📮 <b>问题漂流</b>：你在成形卡留下的问题会飞回入口，成为下一位旅人的参考标签。</div>' +
+      '<div>🧠 <b>内容来源</b>：默认由服务端 LLM（含知乎检索）为你的问题实时生成问题包，来源徽标会如实标注；无服务时可在错误弹窗里显式选择本地演示内容。</div>' +
+      '<div>📮 <b>问题漂流</b>：留下的问题只保存在本浏览器的本地存档里，仅作你自己下次进入时的参考标签；它不会发布到知乎，也不会同步给其他用户。</div>' +
       '<div>✦ 传送门提示：走完 来路 / 此地 / 岔路 三岛，未至岛的门会为你点亮。</div>' +
       '<div>🖐 拖拽旋转 · 滚轮缩放 · 双击回到全景。</div>'
     );
@@ -265,8 +329,9 @@ export class HUD {
     // 每次打开页面随机换一批参考问题；旅人飞回的问题优先浮现
     const qs = pickEntryChips(3);
     for (const it of qs) {
-      const c = this.el('button', 'chip' + (it.from === 'comm' ? ' chip--comm' : ''), chips, (it.from === 'comm' ? '📮 ' : '') + it.q);
-      c.title = it.from === 'comm' ? '来自上一位旅人的问题' : '点击把问题填进下面，作为参考';
+      const c = this.el('button', 'chip' + (it.from === 'comm' ? ' chip--comm' : ''), chips);
+      c.textContent = (it.from === 'comm' ? '📮 ' : '') + it.q;
+      c.title = it.from === 'comm' ? '本浏览器里之前留下的问题（不上传、不跨用户）' : '点击把问题填进下面，作为参考';
       c.addEventListener('click', () => {
         this.input.value = it.q;
         this.chipEls.forEach((x) => x.classList.remove('active'));
@@ -279,7 +344,7 @@ export class HUD {
     this.input = this.el('input', '', row);
     this.input.placeholder = '写下你自己的问题，宇宙会为它单独生成……';
     this.input.maxLength = 40;
-    const ask = this.el('button', 'btn', row, '造一个宇宙');
+    this.askBtn = this.el('button', 'btn', row, '造一个宇宙');
     const actions = this.el('div', 'intro-actions', card);
     this.startBtn = this.el('button', 'btn primary', actions, '开始探索 →');
     this.el('span', 'intro-hint', actions, '建议用电脑全屏体验 · 支持触屏');
@@ -292,10 +357,10 @@ export class HUD {
     const go = () => {
       const custom = this.input.value.trim();
       this.sfx.blip(880);
-      this.cb.onStart(this.selPack, custom || null);
+      this.cb.onStart(custom || null);
     };
     this.startBtn.addEventListener('click', go);
-    ask.addEventListener('click', () => {
+    this.askBtn.addEventListener('click', () => {
       const custom = this.input.value.trim();
       if (!custom) { this.input.focus(); return; }
       this.selPack = 'paint';
@@ -362,7 +427,8 @@ export class HUD {
   }
 
   toast(text, cls) {
-    const t = this.el('div', 'toast panel ' + (cls || 'info'), this.toastwrap, text);
+    const t = this.el('div', 'toast panel ' + (cls || 'info'), this.toastwrap);
+    t.textContent = text;
     setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, 3400);
   }
 

@@ -1,5 +1,6 @@
 // 来路 · 故事小径：沿小径依序点亮三块故事石，每块石下翻出一段经历。
 import { el, esc, fallbackSpots } from './util.js';
+import { askLineEl, sourceRefsEl, completionText } from '../../ui/evidence.js';
 
 const GENERIC = [{ who: '小径', t: '出发之前', body: ['你还记得自己是带着什么问题上路的吗？'] }];
 
@@ -8,7 +9,7 @@ export default {
   title: '来路 · 故事小径',
   hint: '依序点亮故事石，看看每块石下藏着什么',
   mount(ctx) {
-    const { body, cards, placer, anchor, bloomy, effects } = ctx;
+    const { body, cards, placer, anchor, bloomy, effects, sources } = ctx;
     const nodes = (cards.length ? cards : GENERIC).slice(0, 3);
     const spots = anchor.spots?.length ? anchor.spots : fallbackSpots(anchor.center, Math.max(nodes.length, 3));
     body.appendChild(el('p', 'mode-card', '这条小径通向你出发的地方。走到石头旁点亮它，它会先告诉你一段来路上的话。'));
@@ -22,13 +23,19 @@ export default {
         if (i !== lit || stone.classList.contains('mode-stone--lit')) return;
         stone.classList.remove('mode-stone--locked');
         stone.classList.add('mode-stone--lit');
-        stone.querySelector('.mode-stone__text').innerHTML =
+        const textEl = stone.querySelector('.mode-stone__text');
+        textEl.innerHTML =
           '<b>' + esc(card.who ?? '经历') + ' · ' + esc(card.t ?? '') + '</b><small>' + esc(card.body?.[0] ?? '') + '</small>';
+        const ask = askLineEl(ctx.plan, card);
+        if (ask) textEl.appendChild(ask);
+        const refs = sourceRefsEl(card, sources);
+        if (refs) textEl.appendChild(refs);
         lit += 1;
+        try { ctx.recordChoice?.('点亮来路「' + (card.t || '经历') + '」'); } catch { }
         try { effects?.burst?.(spots[i], '#ffb457'); } catch { /* noop */ }
         try { bloomy?.hud?.toast?.(lit < nodes.length ? '石头亮了，继续往前走' : '小径全亮了'); } catch { /* noop */ }
         if (lit === nodes.length) {
-          body.appendChild(el('div', 'mode-done', '✦ 小径点亮 · 来路已回望'));
+          body.appendChild(el('div', 'mode-done', completionText(ctx.plan, '✦ 小径点亮 · 来路已回望')));
           try { bloomy?.hud?.say?.('来路上的这些话，你现在听到的不一样了。'); } catch { /* noop */ }
           ctx.done();
         }

@@ -1,5 +1,6 @@
 // 遇见 · 篝火围坐：点人物听经历，对方反问你，用态度按钮回应，火随共鸣变亮。
 import { el, esc } from './util.js';
+import { sourceRefsEl, stepPromptFor, completionText } from '../../ui/evidence.js';
 
 const FACES = ['🧣', '🎒', '🧢', '🍂'];
 const GENERIC = [
@@ -11,9 +12,9 @@ const GENERIC = [
 export default {
   id: 'yu',
   title: '遇见 · 篝火围坐',
-  hint: '点一个人听TA的经历，TA也会反问你',
+  hint: '查看作者观点摘要，用自己的态度回应',
   mount(ctx) {
-    const { body, cards, placer, anchor, bloomy, effects } = ctx;
+    const { body, cards, placer, anchor, bloomy, effects, sources } = ctx;
     const nodes = (cards.length ? cards : GENERIC).slice(0, 3);
     const fire = el('div', 'mode-fire', '🔥');
     fire.setAttribute('role', 'img');
@@ -24,21 +25,25 @@ export default {
       const fig = el('div', 'mode-figure');
       fig.innerHTML = '<span class="mode-figure__face">' + FACES[i % FACES.length] + '</span>' +
         '<span class="mode-figure__bubble"><b>' + esc(card.who ?? '同行者') + '</b>' +
-        '<small style="display:block;opacity:.7">点这里，听TA说说</small></span>';
+        '<small style="display:block;opacity:.7">点这里，查看来源摘要</small></span>';
       fig.addEventListener('click', () => {
         if (fig.classList.contains('mode-figure--done')) return;
         const b = fig.querySelector('.mode-figure__bubble');
+        const ask = stepPromptFor(ctx.plan, card) || card.ask || '';
         b.innerHTML = '<b>' + esc(card.who ?? '同行者') + ' · ' + esc(card.t ?? '') + '</b><br>' +
           esc((card.body ?? []).join(' ')) +
-          (card.ask ? '<div class="mode-figure__ask">TA 反问你：' + esc(card.ask) + '</div>' : '') +
+          (ask ? '<div class="mode-figure__ask">AI 探索追问：' + esc(ask) + '</div>' : '') +
           '<div class="mode-figure__acts"></div>';
+        const refs = sourceRefsEl(card, sources);
+        if (refs) b.appendChild(refs);
         const acts = b.querySelector('.mode-figure__acts');
-        ['我也有过相似的时刻', '我和你不太一样'].forEach((txt) => {
+        ['这与我的观察相符', '这与我的观察不同'].forEach((txt) => {
           const bt = el('button', 'mode-btn mode-btn--ghost', txt);
           bt.addEventListener('click', () => answer(bt));
           acts.appendChild(bt);
         });
-        function answer() {
+        function answer(button) {
+          ctx.recordChoice?.('对「' + (card.t || '来源观点') + '」选择：' + button.textContent);
           fig.classList.add('mode-figure--done');
           fig.style.cursor = 'default';
           acts.remove();
@@ -50,7 +55,7 @@ export default {
             fire.classList.add('mode-fire--bright');
             body.appendChild(el('div', 'mode-done', '✦ 篝火烧旺 · 遇见已围坐'));
             try { effects?.burst?.(anchor.center, '#ff9640'); } catch { /* noop */ }
-            try { bloomy?.hud?.say?.('火光把每个人的样子都照清楚了。'); } catch { /* noop */ }
+            try { bloomy?.hud?.say?.(completionText(ctx.plan, '火光把每个人的样子都照清楚了。')); } catch { }
             ctx.done();
           } else {
             try { bloomy?.hud?.toast?.('火光亮了一些'); } catch { /* noop */ }

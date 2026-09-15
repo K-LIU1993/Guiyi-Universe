@@ -1,5 +1,6 @@
 // 岔路 · 分岔桥：转动路牌选一条桥过谷，读彼岸之卡，可折返走另一条。
 import { el, esc, short, fallbackSpots } from './util.js';
+import { sourceRefsEl, stepPromptFor, completionText } from '../../ui/evidence.js';
 
 const GENERIC = [
   { t: '左岸的路', body: ['你还没走的那一条。'], ask: '如果不选它，你错过了什么？' },
@@ -11,7 +12,7 @@ export default {
   title: '岔路 · 分岔桥',
   hint: '转动路牌选一条桥，走过去看看对岸',
   mount(ctx) {
-    const { body, cards, placer, anchor, bloomy, effects } = ctx;
+    const { body, cards, placer, anchor, bloomy, effects, sources } = ctx;
     const src = cards.length >= 2 ? cards : GENERIC;
     const sides = src.slice(0, 2).map((c) => ({ label: short(c.t ?? '岸'), card: c }));
     const spots = anchor.spots?.length >= 2
@@ -48,17 +49,21 @@ export default {
         go.disabled = false;
         walk.querySelector('i').style.width = '0';
         const c = sides[side].card;
+        const ask = stepPromptFor(ctx.plan, c) || c.ask || '';
+        ctx.recordChoice?.('过桥到「' + sides[side].label + '」读「' + (c.t || '') + '」');
         view.innerHTML =
           '<b>' + esc(sides[side].label) + ' · ' + esc(c.t ?? '') + '</b><br>' +
           esc((c.body ?? []).join(' ')) +
-          (c.ask ? '<br><span style="color:#ffd166">' + esc(c.ask) + '</span>' : '');
+          (ask ? '<br><span style="color:#ffd166">✦ ' + esc(ask) + '</span>' : '');
+        const refs = sourceRefsEl(c, sources);
+        if (refs) view.appendChild(refs);
         if (!crossed.has(side)) {
           crossed.add(side);
           try { effects?.burst?.(spots[side], '#e2604f'); } catch { /* noop */ }
         }
-        if (!doneFlag) {
+        if (!doneFlag && crossed.size === sides.length) {
           doneFlag = true;
-          body.appendChild(el('div', 'mode-done', '✦ 已过一次桥 · 岔路已选择'));
+          body.appendChild(el('div', 'mode-done', completionText(ctx.plan, '✦ 两条岸都看过 · 点 Bloomy → ⚖️ 比较观点')));
           try { bloomy?.hud?.say?.('另一条路还在那里。想回头的时候，随时可以再走一次。'); } catch { /* noop */ }
           ctx.done();
         }

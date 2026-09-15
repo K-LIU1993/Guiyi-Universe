@@ -1,6 +1,7 @@
 // 成形作曲器 · 成形卡
 import { TYPE_META } from '../game/content.js';
 import { addCommunityQuestion } from '../game/questionPool.js';
+import { renderPlanBar, sourceRefsEl } from './evidence.js';
 
 export class AnswerUI {
   constructor(cb) {
@@ -11,7 +12,7 @@ export class AnswerUI {
   el(tag, cls, parent, html) {
     const e = document.createElement(tag);
     if (cls) e.className = cls;
-    if (html != null) e.innerHTML = html;
+    if (html != null) e.textContent = html;
     if (parent) parent.appendChild(e);
     return e;
   }
@@ -21,7 +22,7 @@ export class AnswerUI {
   }
 
   // 作曲器：question 为当前问题文本，cards 为已收集卡对象
-  openComposer(question, cards) {
+  openComposer(question, cards, plan, sources = []) {
     this.close();
     const bg = this.el('div', 'modal-bg', document.getElementById('ui'));
     this.bg = bg;
@@ -29,6 +30,37 @@ export class AnswerUI {
     this.el('div', 'fm-title', m, '✦ 成形 · 把看见放在一起');
     this.el('div', 'fm-sub', m, '挑 1 到 3 张陪你走到这里的卡作为依据，写下你此刻的答案。');
     this.el('div', 'fm-q', m, question);
+    const guidance = this.el('div', 'form-guidance', m);
+    const renderGuidance = nextPlan => {
+      guidance.textContent = '';
+      if (!nextPlan) return;
+      renderPlanBar(this.el('div', 'plan-bar', guidance), nextPlan);
+      for (const step of nextPlan.steps || []) {
+        const card = cards.find(item => item.id === step.cardId);
+        if (card) this.el('div', 'plan-ask', guidance, '「' + card.t + '」：' + step.prompt);
+      }
+    };
+    if (plan) {
+      this.el('div', 'fm-label', m, '本轮整合任务 · 提示不是标准答案');
+      renderGuidance(plan);
+    }
+    if (this.cb.onReplanForm) {
+      const replan = this.el('button', 'btn small', m, '在线调整整合提示');
+      const feedback = this.el('div', 'plan-hint', m);
+      replan.addEventListener('click', async () => {
+        if (replan.disabled) return;
+        replan.disabled = true;
+        feedback.textContent = '正在结合已选依据与探索记录调整提示…';
+        try {
+          const nextPlan = await this.cb.onReplanForm(Array.from(picks));
+          if (this.bg !== bg || !bg.isConnected) return;
+          renderGuidance(nextPlan);
+          feedback.textContent = '提示已更新，你正在写的答案已保留。';
+        } catch (error) {
+          if (bg.isConnected) feedback.textContent = '在线调整未成功：' + error.message;
+        } finally { replan.disabled = false; }
+      });
+    }
     this.el('div', 'fm-label', m, '① 我的依据');
     const pick = this.el('div', 'fm-pick', m);
     const picks = new Set();
@@ -38,6 +70,8 @@ export class AnswerUI {
       this.el('span', 'fm-box', it);
       const t = this.el('span', 'fm-t', it);
       t.textContent = meta.icon + ' ' + c.t + ' — ' + c.who;
+      const refs = sourceRefsEl(c, sources);
+      if (refs) { refs.addEventListener('click', event => event.stopPropagation()); it.appendChild(refs); }
       it.addEventListener('click', () => {
         if (picks.has(c.id)) { picks.delete(c.id); it.classList.remove('sel'); }
         else if (picks.size >= 3) return;
@@ -115,14 +149,14 @@ export class AnswerUI {
     }
     // 问题漂流：留下一个问题，飞回入口成为下一位旅人的参考标签
     const drift = this.el('div', 'ans-row', m);
-    this.el('div', 'ar-label', drift, '留给下一位旅人的问题');
+    this.el('div', 'ar-label', drift, '留给下次探索的问题');
     const driftWrap = this.el('div', 'drift-wrap', drift);
     const driftInput = this.el('input', 'drift-input', driftWrap);
     driftInput.maxLength = 40;
     driftInput.value = String(ans.open || question || '').slice(0, 40);
-    driftInput.placeholder = '写下你想留给下一位旅人的问题……';
+    driftInput.placeholder = '写下你下次想继续探索的问题……';
     const flyBtn = this.el('button', 'btn small primary', driftWrap, '🕊 让它飞回入口');
-    this.el('div', 'drift-note', drift, '点「换个问题，再来一次」，它就会出现在入口标签里。');
+    this.el('div', 'drift-note', drift, '只保存在本浏览器，不会发布到知乎或分享给其他用户。下次可从入口标签继续探索。');
     flyBtn.addEventListener('click', () => {
       const q = driftInput.value.trim();
       if (q.length < 2) { driftInput.focus(); return; }

@@ -1,13 +1,15 @@
 // 未至 · 迷雾光门：拨散三团迷雾，收集隐藏节点，唤醒绿光门。
 import { el, esc, fallbackSpots } from './util.js';
+import { askLineEl, sourceRefsEl, completionText } from '../../ui/evidence.js';
 
 export default {
   id: 'wei',
   title: '未至 · 迷雾光门',
-  hint: '拨散三团迷雾，收集隐藏的节点，唤醒光门',
+  hint: '逐一拨散迷雾，收集隐藏的节点，唤醒光门',
   mount(ctx) {
-    const { body, cards, placer, anchor, world, effects, bloomy } = ctx;
-    const spots = anchor.spots?.length ? anchor.spots.slice(0, 3) : fallbackSpots(anchor.center, 3, 6);
+    const { body, cards, placer, anchor, world, effects, bloomy, sources } = ctx;
+    const count = cards.length;
+    const spots = anchor.spots?.length >= count ? anchor.spots.slice(0, count) : fallbackSpots(anchor.center, count, 6);
     const gate = el('div', 'mode-gate', '⛩️');
     body.appendChild(gate);
     let cleared = 0;
@@ -21,14 +23,25 @@ export default {
       m.addEventListener('click', () => {
         if (m.classList.contains('mode-mist--cleared')) return;
         m.classList.add('mode-mist--cleared');
-        m.querySelector('.mode-mist__text').innerHTML =
+        const textEl = m.querySelector('.mode-mist__text');
+        textEl.innerHTML =
           '<b>节点 ' + (i + 1) + '</b><small>' + esc(card?.t ?? '一段还没走到的关系') + '</small>';
+        if (card?.body?.[0]) {
+          const ev = el('div', 'plan-evidence');
+          ev.textContent = card.body[0];
+          textEl.appendChild(ev);
+        }
+        const ask = askLineEl(ctx.plan, card);
+        if (ask) textEl.appendChild(ask);
+        const refs = card ? sourceRefsEl(card, sources) : null;
+        if (refs) textEl.appendChild(refs);
         cleared += 1;
+        try { ctx.recordChoice?.('拨开迷雾看「' + (card?.t || '') + '」'); } catch { }
         try { effects?.burst?.(pos, '#8ef2b1'); } catch { /* noop */ }
         if (cleared === spots.length) {
           gate.classList.add('mode-gate--open');
           try { world?.awakenPortal?.(); } catch { /* noop */ }
-          body.appendChild(el('div', 'mode-done', '✦ 光门已醒 · 未至在靠近'));
+          body.appendChild(el('div', 'mode-done', completionText(ctx.plan, '✦ 光门已醒 · 未至在靠近')));
           try { bloomy?.hud?.say?.('迷雾散开的地方，门就亮了。还没到的，正在靠近。'); } catch { /* noop */ }
           ctx.done();
         } else {

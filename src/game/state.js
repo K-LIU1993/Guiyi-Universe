@@ -22,8 +22,10 @@ export const ACHIEVEMENTS = [
 
 export function createState(packId) {
   return {
-    v: 1,
+    v: 2,
     packId: packId,
+    pack: null,
+    packOrigin: null,
    collected: [],
    marked: {},
     regions: {},
@@ -46,9 +48,18 @@ export function loadState() {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
     const s = JSON.parse(raw);
-    if (!s || s.v !== 1 || !s.packId) return null;
+    if (!s || (s.v !== 1 && s.v !== 2) || !s.packId) return null;
     return s;
   } catch (e) { return null; }
+}
+
+const PACK_TYPES = Object.keys(TYPE_REGION);
+
+export function storedPackUsable(p) {
+  if (!p || typeof p !== 'object' || Array.isArray(p)) return false;
+  if (!Array.isArray(p.cards) || p.cards.length === 0) return false;
+  if (typeof p.q !== 'string' || !p.q.trim()) return false;
+  return PACK_TYPES.every((t) => { return p.cards.some((c) => { return c && c.type === t; }); });
 }
 
 export function clearSave() {
