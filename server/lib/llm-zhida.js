@@ -18,7 +18,6 @@ export function createZhidaLlmClient({ accessSecret, model = 'zhida-thinking-1p5
           method: 'POST',
           headers: {
             Authorization: 'Bearer ' + accessSecret,
-            'X-Request-Timestamp': String(Math.floor(Date.now() / 1000)),
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({

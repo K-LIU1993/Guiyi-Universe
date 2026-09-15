@@ -83,6 +83,7 @@ export class HUD {
     this.buildBubble();
     this.buildMinimap();
     this.buildActionbar();
+    this.buildPhilosophyPanel();
     this.toastwrap = this.el('div', 'toastwrap', ui);
     this.buildGenerating();
     this.buildRadial();
@@ -182,6 +183,20 @@ export class HUD {
     this.formBtn.addEventListener('click', () => this.cb.onForm());
   }
 
+  buildPhilosophyPanel() {
+    const panel = this.el('div', 'philosophy-panel panel', this.ui);
+    this.el('div', 'philosophy-kicker', panel, '归一 · 认知冒险');
+    this.philosophyLoop = this.el('div', 'philosophy-loop', panel, '<span class="pl-active">提问</span><i>→</i><span>探索</span><i>→</i><span>对照</span><i>→</i><span>遇见</span><i>→</i><span>成形</span>');
+    this.el('div', 'philosophy-hint', panel, '证据先于结论 · 每次回来，世界多一条路');
+    const islands = this.el('div', 'philosophy-islands', panel);
+    [['lai','经历','别人怎样走过'],['cidi','现实','我面对什么条件'],['cha','分歧','不同答案为何成立'],['wei','未知','我还没想到的可能']].forEach(([key,name,sub]) => {
+      const item = this.el('button', 'philosophy-island', islands);
+      item.innerHTML = '<b>' + name + '</b><small>' + sub + '</small>';
+      item.addEventListener('click', () => this.cb.onMinimap(key));
+    });
+    this.philosophyMission = this.el('div', 'philosophy-mission', panel, '🧭 下一步：把一个问题交给宇宙');
+  }
+
   setFormAvailable(v) { this.formBtn.style.display = v ? '' : 'none'; }
 
   buildRadial() {
@@ -221,7 +236,7 @@ export class HUD {
     this.genEl = this.el('div', 'generating', this.ui);
     this.genEl.style.display = 'none';
     this.genStamp = this.el('div', 'gen-stamp panel', this.genEl);
-    this.el('div', 'gen-sub', this.genEl, '六座认知之岛，正从海面升起……');
+    this.el('div', 'gen-sub', this.genEl, '四座认知之岛，正从海面升起……');
   }
 
   showGenerating(q) {
@@ -391,7 +406,12 @@ export class HUD {
       e.classList.toggle('done', i < n);
       e.classList.toggle('doing', i === n);
     }
+    if (this.philosophyLoop) {
+      this.philosophyLoop.querySelectorAll('span').forEach((el, i) => el.classList.toggle('pl-active', i === n));
+    }
   }
+
+  setMission(text) { if (this.philosophyMission) this.philosophyMission.textContent = '🧭 下一步：' + String(text || '继续探索'); }
 
   // 世界标签（供 engine 投影）
   createTag(r) {

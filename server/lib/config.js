@@ -7,8 +7,8 @@ const CACHE_TTL_MS = 30_000;
 const DEFAULTS = Object.freeze({
   port: 5201,
   host: '127.0.0.1',
-  llmBaseUrl: 'http://127.0.0.1:10100/v1/responses',
-  llmModel: 'amd/Qwen3.8-Flash-Next',
+  llmBaseUrl: 'https://api.openai-next.com/v1/chat/completions',
+  llmModel: 'gpt-5.6-luna',
   llmTimeoutMs: 120_000,
   llmMaxOutputTokens: 6000,
   zhihuTimeoutMs: 30_000,

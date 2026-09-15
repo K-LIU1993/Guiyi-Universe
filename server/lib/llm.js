@@ -12,23 +12,30 @@ export function createLlmClient({ baseUrl, model, apiKey, timeoutMs = 120_000, m
       }
       let resp;
       try {
+        const isChatCompletions = /\/chat\/completions\/?$/i.test(baseUrl || '');
+        const headers = {
+          'content-type': 'application/json',
+          ...(isChatCompletions ? { Authorization: 'Bearer ' + apiKey } : { 'X-OpenCodex-API-Key': apiKey })
+        };
+        const body = isChatCompletions
+          ? {
+              model,
+              stream: false,
+              messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
+              max_tokens: maxTokens || maxOutputTokens
+            }
+          : {
+              model,
+              stream: false,
+              reasoning: { effort: 'low' },
+              text: { format: { type: 'json_object' } },
+              input: [{ role: 'system', content: system }, { role: 'user', content: user }],
+              max_output_tokens: maxTokens || maxOutputTokens
+            };
         resp = await fetch(baseUrl, {
           method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'X-OpenCodex-API-Key': apiKey
-          },
-          body: JSON.stringify({
-            model,
-            stream: false,
-            reasoning: { effort: 'low' },
-            text: { format: { type: 'json_object' } },
-            input: [
-              { role: 'system', content: system },
-              { role: 'user', content: user }
-            ],
-            max_output_tokens: maxTokens || maxOutputTokens
-          }),
+          headers,
+          body: JSON.stringify(body),
           signal: AbortSignal.timeout(timeoutMs)
         });
       } catch (err) {

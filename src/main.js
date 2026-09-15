@@ -123,6 +123,13 @@ function missingText() {
   return miss.join('、') || '再走一走，看看还缺什么';
 }
 
+function updateMission() {
+  if (!hud || !state) return;
+  const next = suggestNext();
+  const labels = { lai: '去经历岛收下一张真实来路', cidi: '去现实岛摆清你的条件', cha: '把两张卡放上对照桌', yu: '去遇见岛听一段真实视角', wei: '拨开迷雾，检查一个盲点', form: '去成形，把暂时判断写下来' };
+  hud.setMission(labels[next] || '继续探索你的问题');
+}
+
 function unlockToasts() {
   const unlocked = S.checkAchievements(state);
   if (unlocked.length < 1) return;
@@ -290,6 +297,7 @@ function enterWorld() {
   universe.setEnergy(S.energyOf(state));
   if (state.answer) answerUI.showAnswer(state.answer, qText(), stats(), pack);
   hud.setFormAvailable(S.formReady(state) && !state.answer);
+  updateMission();
 }
 
 function travel(key) {
@@ -370,6 +378,7 @@ function onCollect(card) {
   hud.toast('收下 · ' + card.t);
   hud.setStep(S.currentStep(state));
   hud.setFormAvailable(S.formReady(state) && !state.answer);
+  updateMission();
 }
 
 function onMark(cardId, mood) {
@@ -393,6 +402,7 @@ function onCompareConfirm(a, b, verdict) {
   universe.setEnergy(S.energyOf(state));
   hud.setStep(S.currentStep(state));
   hud.setFormAvailable(S.formReady(state) && !state.answer);
+  updateMission();
   unlockToasts();
 }
 
@@ -463,6 +473,7 @@ function onSubmit(data) {
   bloomy.say('form_done', true);
   hud.setStep(4);
   hud.setFormAvailable(false);
+  updateMission();
   unlockToasts();
   answerUI.showAnswer(state.answer, qText(), stats(), pack);
 }

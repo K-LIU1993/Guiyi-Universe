@@ -13,15 +13,17 @@ const settings = loadSettings({
 });
 
 const secret = (process.env.ZHIHU_ACCESS_SECRET || '').trim();
+const llmKey = (process.env.GUIYI_LLM_API_KEY || '').trim();
 
 const app = createApp({
   settings,
   clients: {
     zhihu: createHttpZhihuClient({ accessSecret: secret, timeoutMs: settings.zhihuTimeoutMs }),
     llm: createZhidaLlmClient({
-      accessSecret: secret,
-      model: settings.llmModel,
-      timeoutMs: Math.min(settings.llmTimeoutMs, 48000)
+      accessSecret: llmKey,
+      model: process.env.GUIYI_LLM_MODEL || 'gpt-5.6-luna',
+      timeoutMs: Math.min(settings.llmTimeoutMs, 58000),
+      baseUrl: (process.env.GUIYI_LLM_BASE_URL || 'https://api.openai-next.com/v1') + '/chat/completions'
     })
   }
 });
