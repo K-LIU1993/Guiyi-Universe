@@ -17,8 +17,17 @@ export function createHttpZhihuClient({ accessSecret, timeoutMs = 15000, baseUrl
         signal: controller.signal,
         cache: 'no-store'
       });
-      if (!resp.ok) throw { code: 'ZHIHU_HTTP_' + resp.status, message: '知乎 API HTTP ' + resp.status };
-      return await resp.json();
+      if (!resp.ok) {
+        const errText = await resp.text().catch(() => '');
+        console.error('[zhihu-http] HTTP', resp.status, errText.slice(0, 300));
+        throw { code: 'ZHIHU_HTTP_' + resp.status, message: '知乎 API HTTP ' + resp.status };
+      }
+      const text = await resp.text();
+      try { return JSON.parse(text); }
+      catch (err) {
+        console.error('[zhihu-http] bad json:', text.slice(0, 300));
+        throw { code: 'ZHIHU_BAD_JSON', message: '知乎 API 响应不是 JSON' };
+      }
     } catch (err) {
       if (controller.signal.aborted) throw { code: 'ZHIHU_TIMEOUT', message: '知乎 API 超时' };
       throw err;
@@ -32,6 +41,7 @@ export function createHttpZhihuClient({ accessSecret, timeoutMs = 15000, baseUrl
     async searchZhihu(query, count = 5) {
       const raw = await request('/api/v1/content/zhihu_search?Query=' + encodeURIComponent(query) + '&Count=' + count);
       if (!raw || String(raw.Code) !== '0' || !Array.isArray(raw.Data && raw.Data.Items)) {
+        console.error('[zhihu-http] search failed:', JSON.stringify(raw).slice(0, 300));
         throw { code: 'ZHIHU_SEARCH_FAILED', message: '知乎检索返回异常' };
       }
       return raw;

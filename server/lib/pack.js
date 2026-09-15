@@ -16,7 +16,10 @@ export async function generateWorldPack({ question, options = {}, settings, zhih
   const startedAt = Date.now();
   let sources;
   try { sources = zhihu.normalize(await zhihu.searchZhihu(question, 5), 5); }
-  catch (error) { throw new HttpError(503, 'ZHIHU_UNAVAILABLE', '知乎检索暂不可用，尚未生成世界'); }
+  catch (error) {
+    console.error('[pack] zhihu failed:', error && (error.code || error.message || JSON.stringify(error)));
+    throw new HttpError(503, 'ZHIHU_UNAVAILABLE', '知乎检索暂不可用，尚未生成世界');
+  }
   if (!sources.length) throw new HttpError(422, 'ZHIHU_NO_RESULTS', '未检索到可引用内容，请把问题写得更具体');
   const withIslandPlans = options.withIslandPlans !== false;
   const prompt = JSON.stringify({ question, requireIslandPlans: withIslandPlans, sources });
