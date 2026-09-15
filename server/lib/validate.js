@@ -32,9 +32,8 @@ export function validatePack(raw, { question, sources, withIslandPlans = false }
     const id = cleanId(card.id) || `card-${index + 1}`;
     if (ids.has(id)) invalid('卡片 ID 重复');
     ids.add(id);
-    if (!Array.isArray(card.sourceIds)) invalid('卡片缺少来源字段');
-    if (card.sourceIds.some(sourceId => !sourceMap.has(sourceId))) invalid('卡片引用了不存在的来源');
-    const sourceIds = [...new Set(card.sourceIds)].slice(0, 5);
+    const sourceIds = [...new Set(Array.isArray(card.sourceIds) ? card.sourceIds : [])].slice(0, 5);
+    if (sourceIds.some(sourceId => !sourceMap.has(sourceId))) invalid('卡片引用了不存在的来源');
     const t = cleanText(card.t, 80);
     const ask = cleanText(card.ask, 180);
     const body = cleanStringArray(typeof card.body === 'string' ? [card.body] : card.body, 4, 400);

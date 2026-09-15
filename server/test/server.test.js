@@ -55,6 +55,14 @@ test('person identity and excerpt come from real retrieval; unsourced content is
   assert.equal(Object.keys(pack.islandPlans).length, 6);
 });
 
+test('missing sourceIds field degrades to unsourced assumption instead of failing the pack', () => {
+  const input = fixture(); delete input.cards[0].sourceIds;
+  const pack = validatePack(input, { question: '测试问题', sources });
+  assert.deepEqual(pack.cards[0].sourceIds, []);
+  assert.match(pack.cards[0].body[0], /不是已证实/);
+  assert.ok(pack.cards[0].tags.includes('假设'));
+});
+
 test('model scalar body is normalized without inventing content; empty body still fails', () => {
   const input = fixture();
   input.cards[0].body = '模型确实生成的正文。';
