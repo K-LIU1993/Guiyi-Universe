@@ -1,6 +1,6 @@
 # 规则引擎契约 v1（分歧岛 · R/S 唯一接缝）
 
-- 状态：**草案 1.0.0-rc2**（AU 起草；已吸收 J1/K1 对 rc1 的双侧审阅意见；待双侧对 rc2 的结构化回执确认后冻结为 1.0.0）
+- 状态：**已冻结 1.0.0**（AU 起草；已吸收 J1/K1 对 rc1 的双侧审阅意见；rc2 已经 J1/K1 双侧结构化回执确认后冻结，回执定位符存档于 §0）
 - 所有权：本文件归 D 流（Mac）维护；src/game/rules/ 归 R 流（Mac）；src/game/stage/ 归 S 流（Kira）。
 - 依据：deliverables/归一-Universe-v3.1-迭代方案.md 第 3/4/5/9 节。
 - 冻结生效后，任何变更只能由 AU 提案，经两侧 AUA 回执确认，并递增版本号（类型变更递增 minor，存档 schema 破坏性变更递增 major 并写迁移）。
@@ -8,6 +8,7 @@
 ## 0. 版本记录
 
 - rc1 → rc2：结构化冻结回执（§9）；createInitialState 显式 seed 注入（§4）；SceneBinding 经 bind_scene 登记（§3/§4）；eventLog 载荷补全并新增 stance_recorded/scene_bound 事件（§4）；Condition.field 白名单与 opening 完成判据（§4/§5）；旧存档隔离与 preview 禁持久化（§6）；无 URL 教学样例来源约定（§3）；S 流分层起步说明（§8）。
+- rc2 → 1.0.0（冻结）：双侧结构化回执确认（§9），双方 head/remoteHead 均为 edab449，blockers 均为空。J1 回执定位符：threadId `01a0a3ed-0ce2-7e62-8322-c5bbb7c38878`、turnId `01a0a402-766e-7740-a0ad-fd1ddf2f0aa7`、messageId `fco_01a0a402-7691-7742-b9aa-90028eaa6355`。K1 回执定位符（Argus 原生回执，action `stage_5dbab814730245229bc36dcf`）：threadId `01a0a408-781e-7bc1-b5df-465ef67024bb`、turnId `01a0a4a7-54a4-7862-a3cc-a71acc8f616d`、messageId `fco_01a0a4a7-54e9-7961-b75e-09abb7c5330e`。
 
 ## 1. 边界与禁令
 
