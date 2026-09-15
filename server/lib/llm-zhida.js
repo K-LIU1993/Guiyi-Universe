@@ -28,7 +28,7 @@ export function createZhidaLlmClient({ accessSecret, model = 'zhida-thinking-1p5
               { role: 'user', content: user }
             ],
             stream: false,
-            max_tokens: maxTokens || 4096
+            max_tokens: maxTokens || 12000
           }),
           signal: controller.signal
         });

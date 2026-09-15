@@ -16,14 +16,14 @@ const secret = (process.env.ZHIHU_ACCESS_SECRET || '').trim();
 
 const app = createApp({
   settings,
-  clients: () => ({
+  clients: {
     zhihu: createHttpZhihuClient({ accessSecret: secret, timeoutMs: settings.zhihuTimeoutMs }),
     llm: createZhidaLlmClient({
       accessSecret: secret,
       model: settings.llmModel,
       timeoutMs: Math.min(settings.llmTimeoutMs, 48000)
     })
-  })
+  }
 });
 
 export default async function handler(req, res) {
