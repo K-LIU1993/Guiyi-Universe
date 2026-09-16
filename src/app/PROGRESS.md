@@ -23,3 +23,5 @@
 - VERIFIED：原浏览器阻断已解除。初次127.0.0.1访问失败因Vite监听::1，改用localhost；测试先前失败属于路由等待竞态，已等待目标DOM后通过。旧failure文件仅保留排障历史，以acceptance.json为最终结果。
 
 - VERIFIED：最终入口统一回main.ts（加载shell.ts），重新运行build和完整浏览器验收均通过；git diff --check通过，修改范围无越界。REPORT.md与receipt.json记录最终回执；未提交。任务内无剩余阻断，停止扩展。
+- VERIFIED: 第二波样式收尾：迷雾覆盖文案改为“迷雾中”，shell.ts 文件尾空行已清理；npm.cmd run build 通过，git diff --check 通过。
+- VERIFIED: �ڶ������������ͨ����Edge ������·��Bloomy���˶�����������������ˮ��������18 ���ƶ����֡�canvas �������ڡ�console/pageerror=0��
