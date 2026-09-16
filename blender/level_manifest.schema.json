@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Guiyi level binding manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "levelId",
+    "asset",
+    "units",
+    "upAxis",
+    "status",
+    "bindings"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "levelId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "asset": {
+      "type": "string",
+      "pattern": "^/assets/[A-Za-z0-9_.-]+.glb$"
+    },
+    "units": {
+      "const": "meters"
+    },
+    "upAxis": {
+      "const": "Y"
+    },
+    "status": {
+      "enum": [
+        "PLANNED",
+        "VERIFIED"
+      ]
+    },
+    "bindings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "objectId",
+          "nodeName",
+          "kind",
+          "positionMeters",
+          "interaction"
+        ],
+        "properties": {
+          "objectId": {
+            "type": "string",
+            "pattern": "^gy.[a-z0-9_.]+$"
+          },
+          "nodeName": {
+            "type": "string",
+            "pattern": "^(ANCHOR_CAM_(WORLD|ISLAND|PUZZLE)|SLOT_(description|dependency|generalization)|BRIDGE_SEG_[0-9]+|ZONE_[A-Za-z0-9_]+|SPAWN_player|SOUND_[A-Za-z0-9_]+)$"
+          },
+          "kind": {
+            "enum": [
+              "camera",
+              "slot",
+              "bridge",
+              "zone",
+              "spawn",
+              "sound"
+            ]
+          },
+          "positionMeters": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "interaction": {
+            "type": "boolean"
+          },
+          "halfExtentsMeters": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        }
+      }
+    }
+  }
+}

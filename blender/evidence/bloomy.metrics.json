@@ -1,0 +1,181 @@
+{
+  "asset": "bloomy.glb",
+  "units": "meters",
+  "upAxis": "Y",
+  "nodes": [
+    {
+      "objectId": "gy.bloomy.body.lod0",
+      "nodeName": "GY_bloomy_body_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        0.4999999850988388,
+        0.7599999308586121,
+        0.36000001430511475
+      ],
+      "positionMetersYUp": [
+        0.0,
+        0.949999988079071,
+        -0.0
+      ]
+    },
+    {
+      "objectId": "gy.bloomy.head.lod0",
+      "nodeName": "GY_bloomy_head_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        0.5799999535083771,
+        0.559999942779541,
+        0.46000000834465027
+      ],
+      "positionMetersYUp": [
+        0.0,
+        1.4800000190734863,
+        -0.0
+      ]
+    },
+    {
+      "objectId": "gy.bloomy.armL.lod0",
+      "nodeName": "GY_bloomy_armL_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        0.19999998807907104,
+        0.6000000238418579,
+        0.20000000298023224
+      ],
+      "positionMetersYUp": [
+        -0.3400000035762787,
+        0.949999988079071,
+        -0.0
+      ]
+    },
+    {
+      "objectId": "gy.bloomy.armR.lod0",
+      "nodeName": "GY_bloomy_armR_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        0.19999998807907104,
+        0.6000000238418579,
+        0.20000000298023224
+      ],
+      "positionMetersYUp": [
+        0.3400000035762787,
+        0.949999988079071,
+        -0.0
+      ]
+    },
+    {
+      "objectId": "gy.bloomy.legL.lod0",
+      "nodeName": "GY_bloomy_legL_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        0.2199999988079071,
+        0.6399999856948853,
+        0.25999999046325684
+      ],
+      "positionMetersYUp": [
+        -0.14000000059604645,
+        0.3199999928474426,
+        -0.0
+      ]
+    },
+    {
+      "objectId": "gy.bloomy.legR.lod0",
+      "nodeName": "GY_bloomy_legR_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        0.2199999913573265,
+        0.6399999856948853,
+        0.25999999046325684
+      ],
+      "positionMetersYUp": [
+        0.14000000059604645,
+        0.3199999928474426,
+        -0.0
+      ]
+    },
+    {
+      "objectId": "gy.bloomy.eyeL.lod0",
+      "nodeName": "GY_bloomy_eyeL_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        0.11999999359250069,
+        0.16000008583068848,
+        0.06999999284744263
+      ],
+      "positionMetersYUp": [
+        -0.10000000149011612,
+        1.5199999809265137,
+        0.2150000035762787
+      ]
+    },
+    {
+      "objectId": "gy.bloomy.eyeR.lod0",
+      "nodeName": "GY_bloomy_eyeR_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        0.11999998986721039,
+        0.16000008583068848,
+        0.06999999284744263
+      ],
+      "positionMetersYUp": [
+        0.10000000149011612,
+        1.5199999809265137,
+        0.2150000035762787
+      ]
+    },
+    {
+      "objectId": "gy.bloomy.pupilL.lod0",
+      "nodeName": "GY_bloomy_pupilL_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        0.05400000512599945,
+        0.08999991416931152,
+        0.034000009298324585
+      ],
+      "positionMetersYUp": [
+        -0.08500000089406967,
+        1.5199999809265137,
+        0.24699999392032623
+      ]
+    },
+    {
+      "objectId": "gy.bloomy.pupilR.lod0",
+      "nodeName": "GY_bloomy_pupilR_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        0.05400000512599945,
+        0.08999991416931152,
+        0.034000009298324585
+      ],
+      "positionMetersYUp": [
+        0.11500000208616257,
+        1.5199999809265137,
+        0.24699999392032623
+      ]
+    }
+  ],
+  "textures": [],
+  "bytes": 172736,
+  "roundTrip": "VERIFIED",
+  "blenderVersion": "5.2.1 LTS"
+}

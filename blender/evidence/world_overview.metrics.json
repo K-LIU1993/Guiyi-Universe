@@ -1,0 +1,249 @@
+{
+  "asset": "world_overview.glb",
+  "units": "meters",
+  "upAxis": "Y",
+  "nodes": [
+    {
+      "objectId": "gy.overview.island0.lod0",
+      "nodeName": "GY_overview_island0_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        7.0,
+        1.5999999642372131,
+        5.6000001430511475
+      ],
+      "positionMetersYUp": [
+        -5.0,
+        -0.5,
+        4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.landmark0_0.lod0",
+      "nodeName": "GY_overview_landmark0_0_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4499998092651367,
+        1.0000000596046448,
+        0.6000001430511475
+      ],
+      "positionMetersYUp": [
+        -6.0,
+        0.699999988079071,
+        4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.island1.lod0",
+      "nodeName": "GY_overview_island1_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        6.999999761581421,
+        1.5999999642372131,
+        5.6000001430511475
+      ],
+      "positionMetersYUp": [
+        5.0,
+        -0.5,
+        4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.landmark1_0.lod0",
+      "nodeName": "GY_overview_landmark1_0_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4499998092651367,
+        1.0000000596046448,
+        0.6000001430511475
+      ],
+      "positionMetersYUp": [
+        4.0,
+        0.699999988079071,
+        4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.landmark1_1.lod0",
+      "nodeName": "GY_overview_landmark1_1_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4499998092651367,
+        1.2500000596046448,
+        0.6000001430511475
+      ],
+      "positionMetersYUp": [
+        4.650000095367432,
+        0.699999988079071,
+        4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.island2.lod0",
+      "nodeName": "GY_overview_island2_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        7.0,
+        1.5999999642372131,
+        5.6000001430511475
+      ],
+      "positionMetersYUp": [
+        -5.0,
+        -0.5,
+        -4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.landmark2_0.lod0",
+      "nodeName": "GY_overview_landmark2_0_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4499998092651367,
+        1.0000000596046448,
+        0.6000001430511475
+      ],
+      "positionMetersYUp": [
+        -6.0,
+        0.699999988079071,
+        -4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.landmark2_1.lod0",
+      "nodeName": "GY_overview_landmark2_1_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4499998092651367,
+        1.2500000596046448,
+        0.6000001430511475
+      ],
+      "positionMetersYUp": [
+        -5.349999904632568,
+        0.699999988079071,
+        -4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.landmark2_2.lod0",
+      "nodeName": "GY_overview_landmark2_2_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4499998092651367,
+        1.5000000596046448,
+        0.6000001430511475
+      ],
+      "positionMetersYUp": [
+        -4.699999809265137,
+        0.699999988079071,
+        -4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.island3.lod0",
+      "nodeName": "GY_overview_island3_LOD0",
+      "kind": "mesh",
+      "vertices": 114,
+      "triangles": 224,
+      "dimensionsMetersYUp": [
+        6.999999761581421,
+        1.5999999642372131,
+        5.6000001430511475
+      ],
+      "positionMetersYUp": [
+        5.0,
+        -0.5,
+        -4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.landmark3_0.lod0",
+      "nodeName": "GY_overview_landmark3_0_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4499998092651367,
+        1.0000000596046448,
+        0.6000001430511475
+      ],
+      "positionMetersYUp": [
+        4.0,
+        0.699999988079071,
+        -4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.landmark3_1.lod0",
+      "nodeName": "GY_overview_landmark3_1_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4499998092651367,
+        1.2500000596046448,
+        0.6000001430511475
+      ],
+      "positionMetersYUp": [
+        4.650000095367432,
+        0.699999988079071,
+        -4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.landmark3_2.lod0",
+      "nodeName": "GY_overview_landmark3_2_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4499998092651367,
+        1.5000000596046448,
+        0.6000001430511475
+      ],
+      "positionMetersYUp": [
+        5.300000190734863,
+        0.699999988079071,
+        -4.0
+      ]
+    },
+    {
+      "objectId": "gy.overview.landmark3_3.lod0",
+      "nodeName": "GY_overview_landmark3_3_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4499998092651367,
+        1.7500000596046448,
+        0.6000001430511475
+      ],
+      "positionMetersYUp": [
+        5.949999809265137,
+        0.699999988079071,
+        -4.0
+      ]
+    }
+  ],
+  "textures": [],
+  "bytes": 85428,
+  "roundTrip": "VERIFIED",
+  "blenderVersion": "5.2.1 LTS"
+}

@@ -1,0 +1,217 @@
+{
+  "schemaVersion": "1.0.0",
+  "levelId": "divergence",
+  "asset": "/assets/divergence_island.glb",
+  "units": "meters",
+  "upAxis": "Y",
+  "status": "PLANNED",
+  "bindings": [
+    {
+      "objectId": "gy.divergence.anchor_cam_world",
+      "nodeName": "ANCHOR_CAM_WORLD",
+      "kind": "camera",
+      "positionMeters": [
+        12,
+        14,
+        16
+      ],
+      "interaction": false
+    },
+    {
+      "objectId": "gy.divergence.anchor_cam_island",
+      "nodeName": "ANCHOR_CAM_ISLAND",
+      "kind": "camera",
+      "positionMeters": [
+        9,
+        10,
+        12
+      ],
+      "interaction": false
+    },
+    {
+      "objectId": "gy.divergence.anchor_cam_puzzle",
+      "nodeName": "ANCHOR_CAM_PUZZLE",
+      "kind": "camera",
+      "positionMeters": [
+        5,
+        4,
+        6
+      ],
+      "interaction": false
+    },
+    {
+      "objectId": "gy.divergence.slot_description",
+      "nodeName": "SLOT_description",
+      "kind": "slot",
+      "positionMeters": [
+        -3,
+        0.5,
+        2
+      ],
+      "interaction": true
+    },
+    {
+      "objectId": "gy.divergence.slot_dependency",
+      "nodeName": "SLOT_dependency",
+      "kind": "slot",
+      "positionMeters": [
+        3,
+        1.1,
+        2
+      ],
+      "interaction": true
+    },
+    {
+      "objectId": "gy.divergence.slot_generalization",
+      "nodeName": "SLOT_generalization",
+      "kind": "slot",
+      "positionMeters": [
+        2,
+        0.7,
+        -2
+      ],
+      "interaction": true
+    },
+    {
+      "objectId": "gy.divergence.zone_rift",
+      "nodeName": "ZONE_rift",
+      "kind": "zone",
+      "positionMeters": [
+        0,
+        0,
+        0
+      ],
+      "interaction": false,
+      "halfExtentsMeters": [
+        1,
+        1,
+        4
+      ]
+    },
+    {
+      "objectId": "gy.divergence.zone_fork",
+      "nodeName": "ZONE_fork",
+      "kind": "zone",
+      "positionMeters": [
+        -3,
+        0.5,
+        1
+      ],
+      "interaction": false,
+      "halfExtentsMeters": [
+        1.5,
+        1,
+        2
+      ]
+    },
+    {
+      "objectId": "gy.divergence.zone_opposed",
+      "nodeName": "ZONE_opposed",
+      "kind": "zone",
+      "positionMeters": [
+        0,
+        0.5,
+        -2
+      ],
+      "interaction": false,
+      "halfExtentsMeters": [
+        3,
+        1,
+        1.5
+      ]
+    },
+    {
+      "objectId": "gy.divergence.zone_connector",
+      "nodeName": "ZONE_connector",
+      "kind": "zone",
+      "positionMeters": [
+        3,
+        0.5,
+        2
+      ],
+      "interaction": false,
+      "halfExtentsMeters": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "objectId": "gy.divergence.spawn_player",
+      "nodeName": "SPAWN_player",
+      "kind": "spawn",
+      "positionMeters": [
+        -4,
+        0.5,
+        3
+      ],
+      "interaction": false
+    },
+    {
+      "objectId": "gy.divergence.sound_ambient",
+      "nodeName": "SOUND_ambient",
+      "kind": "sound",
+      "positionMeters": [
+        0,
+        2,
+        0
+      ],
+      "interaction": false
+    },
+    {
+      "objectId": "gy.divergence.bridge_seg_0",
+      "nodeName": "BRIDGE_SEG_0",
+      "kind": "bridge",
+      "positionMeters": [
+        -1.0,
+        0.6,
+        -2
+      ],
+      "interaction": true
+    },
+    {
+      "objectId": "gy.divergence.bridge_seg_1",
+      "nodeName": "BRIDGE_SEG_1",
+      "kind": "bridge",
+      "positionMeters": [
+        -0.5,
+        0.6,
+        -2
+      ],
+      "interaction": true
+    },
+    {
+      "objectId": "gy.divergence.bridge_seg_2",
+      "nodeName": "BRIDGE_SEG_2",
+      "kind": "bridge",
+      "positionMeters": [
+        0.0,
+        0.6,
+        -2
+      ],
+      "interaction": true
+    },
+    {
+      "objectId": "gy.divergence.bridge_seg_3",
+      "nodeName": "BRIDGE_SEG_3",
+      "kind": "bridge",
+      "positionMeters": [
+        0.5,
+        0.6,
+        -2
+      ],
+      "interaction": true
+    },
+    {
+      "objectId": "gy.divergence.bridge_seg_4",
+      "nodeName": "BRIDGE_SEG_4",
+      "kind": "bridge",
+      "positionMeters": [
+        1.0,
+        0.6,
+        -2
+      ],
+      "interaction": true
+    }
+  ]
+}

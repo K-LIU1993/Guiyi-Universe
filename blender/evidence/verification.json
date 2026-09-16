@@ -1,0 +1,26 @@
+{
+  "static": "VERIFIED",
+  "schemaCheck": "all keywords used by local schema; not a general JSON Schema implementation",
+  "assets": {
+    "bloomy": {
+      "status": "VERIFIED",
+      "triangles": 2240,
+      "bytes": 172736
+    },
+    "divergence_island": {
+      "status": "VERIFIED",
+      "triangles": 156,
+      "bytes": 22716
+    },
+    "world_overview": {
+      "status": "VERIFIED",
+      "triangles": 1016,
+      "bytes": 85428
+    }
+  },
+  "aggregate": {
+    "triangles": 3412,
+    "bytes": 280880,
+    "under5MB": true
+  }
+}

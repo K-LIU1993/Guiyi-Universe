@@ -1,0 +1,402 @@
+{
+  "asset": "divergence_island.glb",
+  "units": "meters",
+  "upAxis": "Y",
+  "nodes": [
+    {
+      "objectId": "gy.divergence.riftWest.lod0",
+      "nodeName": "GY_divergence_riftWest_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        5.0,
+        1.399999976158142,
+        8.0
+      ],
+      "positionMetersYUp": [
+        -3.5,
+        -0.699999988079071,
+        -0.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.riftEast.lod0",
+      "nodeName": "GY_divergence_riftEast_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        5.0,
+        1.399999976158142,
+        8.0
+      ],
+      "positionMetersYUp": [
+        3.5,
+        -0.699999988079071,
+        -0.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.forkStem.lod0",
+      "nodeName": "GY_divergence_forkStem_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        1.1999998092651367,
+        0.30000001192092896,
+        2.4000000953674316
+      ],
+      "positionMetersYUp": [
+        -3.0,
+        0.15000000596046448,
+        2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.forkLeft.lod0",
+      "nodeName": "GY_divergence_forkLeft_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        2.0200772285461426,
+        0.30000001192092896,
+        2.4580498933792114
+      ],
+      "positionMetersYUp": [
+        -3.700000047683716,
+        0.15000000596046448,
+        0.30000001192092896
+      ]
+    },
+    {
+      "objectId": "gy.divergence.forkRight.lod0",
+      "nodeName": "GY_divergence_forkRight_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        2.0200772285461426,
+        0.30000001192092896,
+        2.4580498933792114
+      ],
+      "positionMetersYUp": [
+        -2.299999952316284,
+        0.15000000596046448,
+        0.30000001192092896
+      ]
+    },
+    {
+      "objectId": "gy.divergence.opposedWest.lod0",
+      "nodeName": "GY_divergence_opposedWest_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        1.5,
+        0.6000000238418579,
+        2.0
+      ],
+      "positionMetersYUp": [
+        -2.0,
+        0.30000001192092896,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.opposedEast.lod0",
+      "nodeName": "GY_divergence_opposedEast_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        1.5,
+        0.6000000238418579,
+        2.0
+      ],
+      "positionMetersYUp": [
+        2.0,
+        0.30000001192092896,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.connector.lod0",
+      "nodeName": "GY_divergence_connector_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "positionMetersYUp": [
+        3.0,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.bridge0.lod0",
+      "nodeName": "GY_divergence_bridge0_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4500000476837158,
+        0.25,
+        0.9000000953674316
+      ],
+      "positionMetersYUp": [
+        -1.0,
+        0.30000001192092896,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.bridge_seg_0",
+      "nodeName": "BRIDGE_SEG_0",
+      "kind": "empty",
+      "positionMetersYUp": [
+        -1.0,
+        0.6000000238418579,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.bridge1.lod0",
+      "nodeName": "GY_divergence_bridge1_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.45000001788139343,
+        0.25,
+        0.9000000953674316
+      ],
+      "positionMetersYUp": [
+        -0.5,
+        0.30000001192092896,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.bridge_seg_1",
+      "nodeName": "BRIDGE_SEG_1",
+      "kind": "empty",
+      "positionMetersYUp": [
+        -0.5,
+        0.6000000238418579,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.bridge2.lod0",
+      "nodeName": "GY_divergence_bridge2_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.44999998807907104,
+        0.25,
+        0.9000000953674316
+      ],
+      "positionMetersYUp": [
+        0.0,
+        0.30000001192092896,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.bridge_seg_2",
+      "nodeName": "BRIDGE_SEG_2",
+      "kind": "empty",
+      "positionMetersYUp": [
+        0.0,
+        0.6000000238418579,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.bridge3.lod0",
+      "nodeName": "GY_divergence_bridge3_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.45000001788139343,
+        0.25,
+        0.9000000953674316
+      ],
+      "positionMetersYUp": [
+        0.5,
+        0.30000001192092896,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.bridge_seg_3",
+      "nodeName": "BRIDGE_SEG_3",
+      "kind": "empty",
+      "positionMetersYUp": [
+        0.5,
+        0.6000000238418579,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.bridge4.lod0",
+      "nodeName": "GY_divergence_bridge4_LOD0",
+      "kind": "mesh",
+      "vertices": 8,
+      "triangles": 12,
+      "dimensionsMetersYUp": [
+        0.4500000476837158,
+        0.25,
+        0.9000000953674316
+      ],
+      "positionMetersYUp": [
+        1.0,
+        0.30000001192092896,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.bridge_seg_4",
+      "nodeName": "BRIDGE_SEG_4",
+      "kind": "empty",
+      "positionMetersYUp": [
+        1.0,
+        0.6000000238418579,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.anchor_cam_world",
+      "nodeName": "ANCHOR_CAM_WORLD",
+      "kind": "empty",
+      "positionMetersYUp": [
+        12.0,
+        14.0,
+        16.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.anchor_cam_island",
+      "nodeName": "ANCHOR_CAM_ISLAND",
+      "kind": "empty",
+      "positionMetersYUp": [
+        9.0,
+        10.0,
+        12.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.anchor_cam_puzzle",
+      "nodeName": "ANCHOR_CAM_PUZZLE",
+      "kind": "empty",
+      "positionMetersYUp": [
+        5.0,
+        4.0,
+        6.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.slot_description",
+      "nodeName": "SLOT_description",
+      "kind": "empty",
+      "positionMetersYUp": [
+        -3.0,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.slot_dependency",
+      "nodeName": "SLOT_dependency",
+      "kind": "empty",
+      "positionMetersYUp": [
+        3.0,
+        1.100000023841858,
+        2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.slot_generalization",
+      "nodeName": "SLOT_generalization",
+      "kind": "empty",
+      "positionMetersYUp": [
+        2.0,
+        0.699999988079071,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.zone_rift",
+      "nodeName": "ZONE_rift",
+      "kind": "empty",
+      "positionMetersYUp": [
+        0.0,
+        0.0,
+        -0.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.zone_fork",
+      "nodeName": "ZONE_fork",
+      "kind": "empty",
+      "positionMetersYUp": [
+        -3.0,
+        0.5,
+        1.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.zone_opposed",
+      "nodeName": "ZONE_opposed",
+      "kind": "empty",
+      "positionMetersYUp": [
+        0.0,
+        0.5,
+        -2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.zone_connector",
+      "nodeName": "ZONE_connector",
+      "kind": "empty",
+      "positionMetersYUp": [
+        3.0,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.spawn_player",
+      "nodeName": "SPAWN_player",
+      "kind": "empty",
+      "positionMetersYUp": [
+        -4.0,
+        0.5,
+        3.0
+      ]
+    },
+    {
+      "objectId": "gy.divergence.sound_ambient",
+      "nodeName": "SOUND_ambient",
+      "kind": "empty",
+      "positionMetersYUp": [
+        0.0,
+        2.0,
+        -0.0
+      ]
+    }
+  ],
+  "textures": [],
+  "bytes": 22716,
+  "roundTrip": "VERIFIED",
+  "blenderVersion": "5.2.1 LTS"
+}
