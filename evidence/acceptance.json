@@ -1,0 +1,41 @@
+{
+  "status": "passed",
+  "http": 200,
+  "fixture": "isolated browser context; API route fixture",
+  "checks": [
+    "three sources",
+    "source attribution",
+    "teaching badge",
+    "all three disclosures",
+    "history byte-identical",
+    "actual progress snapshot",
+    "empty and corrupt save",
+    "viewpoint filtering",
+    "390px overflow",
+    "all targets >=44px"
+  ],
+  "mobile": {
+    "width": 390,
+    "scroll": 390,
+    "targets": [
+      {
+        "h": 44,
+        "w": 316
+      },
+      {
+        "h": 44,
+        "w": 316
+      },
+      {
+        "h": 44,
+        "w": 316
+      },
+      {
+        "h": 44,
+        "w": 151
+      }
+    ]
+  },
+  "consoleErrors": [],
+  "pageErrors": []
+}

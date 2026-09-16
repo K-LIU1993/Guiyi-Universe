@@ -1,0 +1,6 @@
+﻿{
+    "scope":  "meet.html,src/meet/**,vite.config.js input only",
+    "build":  "passed",
+    "matches":  0,
+    "rgExitCode":  1
+}
