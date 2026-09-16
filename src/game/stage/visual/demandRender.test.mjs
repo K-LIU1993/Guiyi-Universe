@@ -1,0 +1,7 @@
+﻿import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createDemandRenderController } from './demandRender.js';
+import { createQualityStabilityController } from './qualityStability.js';
+
+test('reading panel pauses animation and renders on state changes', async () => { let renders = 0; const pauses = []; const controller = createDemandRenderController({ render: () => { renders += 1; }, setAnimationPaused: (value) => pauses.push(value) }); controller.openReadingPanel(); await new Promise((resolve) => setTimeout(resolve, 5)); assert.equal(controller.isReadingPanelOpen(), true); assert.deepEqual(pauses, [true]); assert.equal(renders, 1); controller.closeReadingPanel(); await new Promise((resolve) => setTimeout(resolve, 5)); assert.equal(controller.isReadingPanelOpen(), false); assert.deepEqual(pauses, [true, false]); assert.equal(renders, 2); });
+test('quality changes only after sustained degradation and preserves manual level', () => { const changes = []; const controller = createQualityStabilityController({ degradeAfter: 3, recoverAfter: 2, onChange: (level, reason) => changes.push([level, reason]) }); controller.sample(true); controller.sample(true); assert.equal(controller.getLevel(), 'high'); controller.sample(true); assert.equal(controller.getLevel(), 'medium'); controller.setManual('high'); controller.sample(true); controller.sample(true); assert.equal(controller.getLevel(), 'high'); assert.deepEqual(changes, [['medium', 'automatic-degrade'], ['high', 'manual']]); });

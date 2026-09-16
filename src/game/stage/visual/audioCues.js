@@ -1,0 +1,1 @@
+﻿export const audioCues = Object.freeze({ hover: 'soft-hover', select: 'soft-select', validPlacement: 'warm-lock', invalidPlacement: 'gentle-nudge', undo: 'soft-retract', structureChanged: 'bridge-resolve', taskSaved: 'quiet-confirm' });

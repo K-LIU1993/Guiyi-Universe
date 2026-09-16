@@ -15,6 +15,8 @@ import { HUD } from './ui/hud.js';
 import { CardsUI } from './ui/cards.js';
 import { AnswerUI } from './ui/answer.js';
 import { createModes } from './game/modes/index.js';
+import { loadAndBindBFlow } from './game/stage/visual/bFlowScene.js';
+import { createPerfObserver } from './game/stage/visual/perfObserver.js';
 
 // Bloomy 的六岛深一层解说
 const EXPLAIN = {
@@ -503,6 +505,12 @@ function boot() {
   engine = new Engine(document.getElementById('scene'), universe);
   effects = new Effects(universe.scene);
   universe.setEffects(effects);
+  const perf = createPerfObserver(engine.renderer, {
+    onSample: (sample) => console.debug('[P1 perf]', sample),
+  });
+  loadAndBindBFlow({ scene: universe.scene }).catch((error) => {
+    console.warn('[P1 visual] B-flow asset unavailable:', error.message);
+  });
 
   bloomy = new Bloomy();
   bloomy.group.visible = false;
@@ -567,6 +575,7 @@ function boot() {
   }
 
   engine.onFrame((dt) => {
+    perf.tick();
     if (generating) engine.rig.dTheta += dt * 0.12;
     bloomy.update(dt);
     effects.update(dt);
