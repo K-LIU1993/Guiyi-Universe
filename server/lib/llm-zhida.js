@@ -9,7 +9,7 @@ export function createZhidaLlmClient({ accessSecret, model = 'zhida-thinking-1p5
     configured: Boolean(accessSecret),
     get lastResponse() { return lastResponse; },
     async generate({ system, user, maxTokens }) {
-      if (!accessSecret) throw new HttpError(503, 'LLM_NOT_CONFIGURED', '直答凭证未配置');
+      if (!accessSecret) throw new HttpError(503, 'LLM_NOT_CONFIGURED', '直答凭证未配置，请设置 ZHIHU_ACCESS_SECRET');
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       let resp;
@@ -37,7 +37,11 @@ export function createZhidaLlmClient({ accessSecret, model = 'zhida-thinking-1p5
       } finally {
         clearTimeout(timer);
       }
-      if (!resp.ok) throw new HttpError(502, 'LLM_UPSTREAM_ERROR', '直答上游返回 ' + resp.status);
+      if (!resp.ok) {
+        await resp.text().catch(() => '');
+        if (resp.status === 401 || resp.status === 403) throw new HttpError(401, 'LLM_CREDENTIAL_INVALID', '直答凭证无效或已过期，请更新 ZHIHU_ACCESS_SECRET');
+        throw new HttpError(503, 'LLM_UPSTREAM_ERROR', '直答服务暂不可用，请稍后重试');
+      }
       let data;
       try { data = await resp.json(); } catch (err) { throw new HttpError(502, 'LLM_BAD_RESPONSE', '直答响应不是 JSON'); }
       lastResponse = { model, returnedModel: data && data.model || null, responseId: data && data.id || null, usage: data && data.usage || null };

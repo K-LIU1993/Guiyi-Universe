@@ -5,6 +5,7 @@ import { normalizeItems } from './zhihu.js';
 
 export function createHttpZhihuClient({ accessSecret, timeoutMs = 15000, baseUrl = 'https://developer.zhihu.com' }) {
   async function request(path) {
+    if (!accessSecret) throw { code: 'ZHIHU_NOT_CONFIGURED', status: 503, message: '知乎凭证未配置，请设置 ZHIHU_ACCESS_SECRET' };
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -18,9 +19,9 @@ export function createHttpZhihuClient({ accessSecret, timeoutMs = 15000, baseUrl
         cache: 'no-store'
       });
       if (!resp.ok) {
-        const errText = await resp.text().catch(() => '');
-        console.error('[zhihu-http] HTTP', resp.status, errText.slice(0, 300));
-        throw { code: 'ZHIHU_HTTP_' + resp.status, message: '知乎 API HTTP ' + resp.status };
+        await resp.text().catch(() => '');
+        const status = resp.status === 401 || resp.status === 403 ? 401 : 503;
+        throw { code: status === 401 ? 'ZHIHU_CREDENTIAL_INVALID' : 'ZHIHU_HTTP_' + resp.status, status, message: status === 401 ? '知乎凭证无效或已过期，请更新 ZHIHU_ACCESS_SECRET' : '知乎服务暂不可用，请稍后重试' };
       }
       const text = await resp.text();
       try { return JSON.parse(text); }

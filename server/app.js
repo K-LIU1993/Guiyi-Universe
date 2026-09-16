@@ -54,8 +54,8 @@ export function createApp(options = {}) {
       if (req.method === 'GET' && pathname === '/api/llm/health') {
         const credentials = getCredentials();
         return sendJson(res, 200, {
-          ok: Boolean(credentials.llm.hasApiKey && credentials.zhihu.cliFound),
-          validation: 'configuration-only',
+          ok: Boolean(credentials.llm.hasApiKey && credentials.zhihu.accessSecretLoaded),
+          validation: { configuration: Boolean(credentials.llm.hasApiKey && credentials.zhihu.accessSecretLoaded), performed: false },
           llm: { ...credentials.llm, model: settings.llmModel, baseUrl: settings.llmBaseUrl },
           zhihu: {
             cliFound: credentials.zhihu.cliFound,

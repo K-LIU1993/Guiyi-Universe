@@ -68,13 +68,20 @@ function buildHeuristicPack({ question, sources, withIslandPlans }) {
   return pack;
 }
 
+function buildLocalFallback(question, withIslandPlans, errorCode) {
+  const sources = [{ id: 'local-sample-1', title: 'Local teaching sample', author: 'Guiyi local sample', excerpt: 'Local evidence for the teaching path.' }];
+  const local = buildHeuristicPack({ question, sources, withIslandPlans });
+  return { ok: true, id: 'local-fallback-' + randomUUID(), ...local, provenance: { engine: 'local', source: 'local-fallback', generatedAt: new Date().toISOString(), errorCode } };
+}
+
 export async function generateWorldPack({ question, options = {}, settings, zhihu, llm }) {
   const startedAt = Date.now();
   let sources;
   try { sources = zhihu.normalize(await zhihu.searchZhihu(question, 5), 5); }
   catch (error) {
     console.error('[pack] zhihu failed:', error && (error.code || error.message || JSON.stringify(error)));
-    throw new HttpError(503, 'ZHIHU_UNAVAILABLE', '知乎检索暂不可用，尚未生成世界');
+    if (options.teachingSample) return buildLocalFallback(question, options.withIslandPlans !== false, error.code || 'ZHIHU_UNAVAILABLE');
+    throw new HttpError(error.status === 401 ? 401 : 503, error.code || 'ZHIHU_UNAVAILABLE', error.message || 'Zhihu service is unavailable; update credentials or retry later');
   }
   if (!sources.length) throw new HttpError(422, 'ZHIHU_NO_RESULTS', '未检索到可引用内容，请把问题写得更具体');
   const withIslandPlans = options.withIslandPlans !== false;
@@ -96,7 +103,10 @@ export async function generateWorldPack({ question, options = {}, settings, zhih
         }
       };
     } catch (error) {
-      if (!['LLM_BAD_JSON', 'LLM_PACK_INVALID'].includes(error.code)) throw error;
+      if (!['LLM_BAD_JSON', 'LLM_PACK_INVALID'].includes(error.code)) {
+        if (options.teachingSample && [401, 502, 503, 504].includes(error.status)) return buildLocalFallback(question, withIslandPlans, error.code || 'LLM_UNAVAILABLE');
+        throw error;
+      }
       lastError = error;
       console.error('[pack] attempt', attempt, 'failed:', error.message);
     }

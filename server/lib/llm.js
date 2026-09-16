@@ -45,7 +45,9 @@ export function createLlmClient({ baseUrl, model, apiKey, timeoutMs = 120_000, m
         throw new HttpError(502, 'LLM_UNREACHABLE', 'LLM 服务不可达');
       }
       if (!resp.ok) {
-        throw new HttpError(502, 'LLM_UPSTREAM_ERROR', 'LLM 上游返回 ' + resp.status);
+        await resp.text().catch(() => '');
+        if (resp.status === 401 || resp.status === 403) throw new HttpError(401, 'LLM_CREDENTIAL_INVALID', 'LLM credential invalid or expired; update API key');
+        throw new HttpError(503, 'LLM_UPSTREAM_ERROR', 'LLM service is temporarily unavailable; retry later');
       }
       let data;
       try {
