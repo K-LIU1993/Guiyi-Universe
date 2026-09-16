@@ -1,0 +1,184 @@
+{
+  "status": "passed",
+  "browser": "153.0.4234.32",
+  "checks": [
+    "Full question/filter/favorite/compare/marks/meet/shape/save/unlock flow; reload persistence",
+    "Four filters and four island entrances",
+    "18 mobile layouts: no overflow, targets >=44px, side-by-side comparison",
+    "Canvas disposal/recreation and five repeat roundtrips"
+  ],
+  "layouts": [
+    {
+      "route": "home",
+      "width": 375,
+      "scroll": 375,
+      "canvas": 1,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "explore",
+      "width": 375,
+      "scroll": 375,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "detail",
+      "width": 375,
+      "scroll": 375,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "compare",
+      "width": 375,
+      "scroll": 375,
+      "canvas": 0,
+      "small": [],
+      "compare": [
+        {
+          "x": 20,
+          "y": 184.015625
+        },
+        {
+          "x": 192.5,
+          "y": 184.015625
+        }
+      ]
+    },
+    {
+      "route": "meet",
+      "width": 375,
+      "scroll": 375,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "shape",
+      "width": 375,
+      "scroll": 375,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "home",
+      "width": 390,
+      "scroll": 390,
+      "canvas": 1,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "explore",
+      "width": 390,
+      "scroll": 390,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "detail",
+      "width": 390,
+      "scroll": 390,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "compare",
+      "width": 390,
+      "scroll": 390,
+      "canvas": 0,
+      "small": [],
+      "compare": [
+        {
+          "x": 20,
+          "y": 184.015625
+        },
+        {
+          "x": 200,
+          "y": 184.015625
+        }
+      ]
+    },
+    {
+      "route": "meet",
+      "width": 390,
+      "scroll": 390,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "shape",
+      "width": 390,
+      "scroll": 390,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "home",
+      "width": 430,
+      "scroll": 430,
+      "canvas": 1,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "explore",
+      "width": 430,
+      "scroll": 430,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "detail",
+      "width": 430,
+      "scroll": 430,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "compare",
+      "width": 430,
+      "scroll": 430,
+      "canvas": 0,
+      "small": [],
+      "compare": [
+        {
+          "x": 20,
+          "y": 184.015625
+        },
+        {
+          "x": 220,
+          "y": 184.015625
+        }
+      ]
+    },
+    {
+      "route": "meet",
+      "width": 430,
+      "scroll": 430,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    },
+    {
+      "route": "shape",
+      "width": 430,
+      "scroll": 430,
+      "canvas": 0,
+      "small": [],
+      "compare": []
+    }
+  ],
+  "errors": []
+}

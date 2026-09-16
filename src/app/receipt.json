@@ -1,0 +1,10 @@
+{
+  "flow": "U-APP",
+  "status": "verified_complete",
+  "head": "ca5c68d16173b73d10bb59b2f221ac46d9a30279",
+  "tests": ["build PASS", "Edge full flow and persistence PASS", "18 mobile layouts PASS", "canvas lifecycle PASS", "console/page errors 0", "git diff --check PASS"],
+  "artifacts": ["app.html", "src/app/REPORT.md", "src/app/PROGRESS.md", "src/app/evidence/acceptance.json", "src/app/evidence/*.png"],
+  "evidence": ["375/390/430px six screens", "four filters and island entrances", "collection/comparison/marks/form save/unlock/reload persistence", "authorized scope only"],
+  "blockers": [],
+  "next": "原任务完成；工作区未提交，供协调流集成。"
+}
