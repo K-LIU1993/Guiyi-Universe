@@ -1,0 +1,88 @@
+{
+  "type": "object",
+  "properties": {
+    "template": {
+      "const": "real-question"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,79}$"
+    },
+    "contentVersion": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "const": "real"
+        },
+        "createdBy": {
+          "const": "human"
+        }
+      },
+      "required": [
+        "level",
+        "createdBy"
+      ],
+      "additionalProperties": false
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000,
+          "pattern": "\\S"
+        },
+        "fetchedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "excerpt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000,
+          "pattern": "\\S"
+        },
+        "verifiedBy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "url",
+        "author",
+        "fetchedAt",
+        "excerpt",
+        "verifiedBy"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "template",
+    "id",
+    "contentVersion",
+    "provenance",
+    "text",
+    "source"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:guiyi:content:real-question:1"
+}

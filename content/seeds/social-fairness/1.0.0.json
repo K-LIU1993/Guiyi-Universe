@@ -1,0 +1,63 @@
+{
+  "format": "guiyi.divergence-island.seed",
+  "schemaVersion": 1,
+  "id": "social-fairness",
+  "contentVersion": "1.0.0",
+  "title": "社交与公平",
+  "question": "共同活动中，怎样讨论时间投入与公平？",
+  "provenance": {
+    "level": "teaching",
+    "createdBy": "ai"
+  },
+  "isTeachingSample": true,
+  "excerpt": "AI 填充的虚构教学材料，不是真实访谈、调研或作者观点；仅用于练习来源、条件与分歧辨识。",
+  "sources": [
+    {
+      "id": "social-fairness-source-1",
+      "title": "社交与公平·教学情境1",
+      "fetchedAt": "2026-09-17T00:00:00Z",
+      "excerpt": "教学情境：小组计划每人每周投入八小时组织活动；相同计划尚未说明负担相同。",
+      "isTeachingSample": true
+    },
+    {
+      "id": "social-fairness-source-2",
+      "title": "社交与公平·教学情境2",
+      "fetchedAt": "2026-09-17T00:00:00Z",
+      "excerpt": "教学情境：一位虚构成员本周实际只有三小时可投入，仍提出了活动建议。",
+      "isTeachingSample": true
+    },
+    {
+      "id": "social-fairness-source-3",
+      "title": "社交与公平·教学情境3",
+      "fetchedAt": "2026-09-17T00:00:00Z",
+      "excerpt": "教学对照：另一位虚构成员投入八小时；时长未记录协作质量或个人限制。",
+      "isTeachingSample": true
+    }
+  ],
+  "claims": [
+    {
+      "id": "social-fairness-claim-1",
+      "text": "共同约定可投入时段可能减少误解。",
+      "scope": "仅为上述虚构情境中待讨论的观点，不是现实人生结论。"
+    },
+    {
+      "id": "social-fairness-claim-2",
+      "text": "公平不能仅由投入小时数判定。",
+      "scope": "仅为上述虚构情境中待讨论的观点，不是现实人生结论。"
+    }
+  ],
+  "conditions": [
+    {
+      "field": "time.weekly_hours_plan",
+      "op": "gte",
+      "value": 8,
+      "label": "计划每周投入至少8小时"
+    },
+    {
+      "field": "time.weekly_hours_actual",
+      "op": "lte",
+      "value": 3,
+      "label": "实际每周投入不超过3小时"
+    }
+  ]
+}

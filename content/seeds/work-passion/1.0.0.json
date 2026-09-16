@@ -1,0 +1,63 @@
+{
+  "format": "guiyi.divergence-island.seed",
+  "schemaVersion": 1,
+  "id": "work-passion",
+  "contentVersion": "1.0.0",
+  "title": "工作与热爱",
+  "question": "在工作之外，怎样安排对热爱的投入？",
+  "provenance": {
+    "level": "teaching",
+    "createdBy": "ai"
+  },
+  "isTeachingSample": true,
+  "excerpt": "AI 填充的虚构教学材料，不是真实访谈、调研或作者观点；仅用于练习来源、条件与分歧辨识。",
+  "sources": [
+    {
+      "id": "work-passion-source-1",
+      "title": "工作与热爱·教学情境1",
+      "fetchedAt": "2026-09-17T00:00:00Z",
+      "excerpt": "教学情境：角色计划每周拿出八小时学习绘画；这里只记录计划，并未证明长期效果。",
+      "isTeachingSample": true
+    },
+    {
+      "id": "work-passion-source-2",
+      "title": "工作与热爱·教学情境2",
+      "fetchedAt": "2026-09-17T00:00:00Z",
+      "excerpt": "教学情境：角色本周实际投入三小时，照护和休息占用了原定时段；这不代表缺乏热爱。",
+      "isTeachingSample": true
+    },
+    {
+      "id": "work-passion-source-3",
+      "title": "工作与热爱·教学情境3",
+      "fetchedAt": "2026-09-17T00:00:00Z",
+      "excerpt": "教学对照：另一角色实际投入八小时，但是否转行仍缺少收入需求和体验信息。",
+      "isTeachingSample": true
+    }
+  ],
+  "claims": [
+    {
+      "id": "work-passion-claim-1",
+      "text": "稳定时段可能帮助尝试热爱。",
+      "scope": "仅为上述虚构情境中待讨论的观点，不是现实人生结论。"
+    },
+    {
+      "id": "work-passion-claim-2",
+      "text": "投入时长不能单独决定是否转行。",
+      "scope": "仅为上述虚构情境中待讨论的观点，不是现实人生结论。"
+    }
+  ],
+  "conditions": [
+    {
+      "field": "time.weekly_hours_plan",
+      "op": "gte",
+      "value": 8,
+      "label": "计划每周投入至少8小时"
+    },
+    {
+      "field": "time.weekly_hours_actual",
+      "op": "lte",
+      "value": 3,
+      "label": "实际每周投入不超过3小时"
+    }
+  ]
+}

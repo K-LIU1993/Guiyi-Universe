@@ -1,0 +1,18 @@
+✔ real-question: accepts controlled fields and rejects invalid/missing fields (1.9008ms)
+✔ real-answer: accepts controlled fields and rejects invalid/missing fields (0.2852ms)
+✔ viewpoint: accepts controlled fields and rejects invalid/missing fields (0.2294ms)
+✔ condition-scenario: accepts controlled fields and rejects invalid/missing fields (0.7115ms)
+✔ teaching-sample: accepts controlled fields and rejects invalid/missing fields (0.1645ms)
+✔ exported JSON Schemas match the runtime schema source (13.2718ms)
+✔ real content rejects paraphrases, invalid dates and credential URLs (0.3554ms)
+✔ three seed packs pass, reject malformed boundaries (8.7357ms)
+✔ HTTP list/get, pinned version, query errors and read-only enforcement (218.1714ms)
+✔ invalid content never enters catalog; ambiguous versions require explicit pin (22.3206ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 344.5117

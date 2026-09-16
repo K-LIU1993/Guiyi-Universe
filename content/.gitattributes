@@ -1,0 +1,2 @@
+# Published seed byte hashes must survive Windows checkouts.
+seeds/**/*.json text eol=lf

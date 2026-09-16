@@ -1,0 +1,63 @@
+{
+  "format": "guiyi.divergence-island.seed",
+  "schemaVersion": 1,
+  "id": "growth-choice",
+  "contentVersion": "1.0.0",
+  "title": "成长与选择",
+  "question": "面对新的学习方向，怎样安排小规模尝试？",
+  "provenance": {
+    "level": "teaching",
+    "createdBy": "ai"
+  },
+  "isTeachingSample": true,
+  "excerpt": "AI 填充的虚构教学材料，不是真实访谈、调研或作者观点；仅用于练习来源、条件与分歧辨识。",
+  "sources": [
+    {
+      "id": "growth-choice-source-1",
+      "title": "成长与选择·教学情境1",
+      "fetchedAt": "2026-09-17T00:00:00Z",
+      "excerpt": "教学情境：角色计划每周用八小时学习一个新方向，以便记录自己的体验。",
+      "isTeachingSample": true
+    },
+    {
+      "id": "growth-choice-source-2",
+      "title": "成长与选择·教学情境2",
+      "fetchedAt": "2026-09-17T00:00:00Z",
+      "excerpt": "教学情境：角色实际每周投入三小时，任务进展与计划出现差距，原因尚待了解。",
+      "isTeachingSample": true
+    },
+    {
+      "id": "growth-choice-source-3",
+      "title": "成长与选择·教学情境3",
+      "fetchedAt": "2026-09-17T00:00:00Z",
+      "excerpt": "教学对照：另一角色实际投入八小时，却仍在比较不同方向；时长不能代表适合程度。",
+      "isTeachingSample": true
+    }
+  ],
+  "claims": [
+    {
+      "id": "growth-choice-claim-1",
+      "text": "有限时段的尝试可能提供选择依据。",
+      "scope": "仅为上述虚构情境中待讨论的观点，不是现实人生结论。"
+    },
+    {
+      "id": "growth-choice-claim-2",
+      "text": "计划与实际的差距值得讨论，但不等于能力结论。",
+      "scope": "仅为上述虚构情境中待讨论的观点，不是现实人生结论。"
+    }
+  ],
+  "conditions": [
+    {
+      "field": "time.weekly_hours_plan",
+      "op": "gte",
+      "value": 8,
+      "label": "计划每周投入至少8小时"
+    },
+    {
+      "field": "time.weekly_hours_actual",
+      "op": "lte",
+      "value": 3,
+      "label": "实际每周投入不超过3小时"
+    }
+  ]
+}

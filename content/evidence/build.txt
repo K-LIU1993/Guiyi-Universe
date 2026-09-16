@@ -1,0 +1,13 @@
+
+> guiyi-universe@0.1.0 build
+> vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 33 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.57 kB │ gzip:   0.40 kB
+dist/assets/index-Bgnp0m7S.css   28.91 kB │ gzip:   6.67 kB
+dist/assets/index-BilicAB-.js   659.04 kB │ gzip: 188.54 kB
+✓ built in 1.69s

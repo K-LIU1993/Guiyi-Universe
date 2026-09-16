@@ -1,0 +1,113 @@
+{
+  "type": "object",
+  "properties": {
+    "template": {
+      "const": "condition-scenario"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,79}$"
+    },
+    "contentVersion": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"
+    },
+    "provenance": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "level": {
+              "enum": [
+                "real",
+                "teaching",
+                "ai_inference"
+              ]
+            },
+            "createdBy": {
+              "const": "human"
+            }
+          },
+          "required": [
+            "level",
+            "createdBy"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "level": {
+              "enum": [
+                "teaching",
+                "ai_inference"
+              ]
+            },
+            "createdBy": {
+              "const": "ai"
+            }
+          },
+          "required": [
+            "level",
+            "createdBy"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "context": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "condition": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "enum": [
+            "time.weekly_hours_plan",
+            "time.weekly_hours_actual"
+          ]
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "neq",
+            "gte",
+            "lte"
+          ]
+        },
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 168
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "value",
+        "label"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "template",
+    "id",
+    "contentVersion",
+    "provenance",
+    "context",
+    "condition"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:guiyi:content:condition-scenario:1"
+}

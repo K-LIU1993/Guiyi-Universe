@@ -1,0 +1,62 @@
+{
+  "type": "object",
+  "properties": {
+    "template": {
+      "const": "teaching-sample"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,79}$"
+    },
+    "contentVersion": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "const": "teaching"
+        },
+        "createdBy": {
+          "enum": [
+            "human",
+            "ai"
+          ]
+        }
+      },
+      "required": [
+        "level",
+        "createdBy"
+      ],
+      "additionalProperties": false
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "excerpt": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "isTeachingSample": {
+      "const": true
+    }
+  },
+  "required": [
+    "template",
+    "id",
+    "contentVersion",
+    "provenance",
+    "title",
+    "excerpt",
+    "isTeachingSample"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:guiyi:content:teaching-sample:1"
+}

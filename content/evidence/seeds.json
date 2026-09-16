@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "count": 3,
+  "seeds": [
+    {
+      "id": "growth-choice@1.0.0",
+      "sources": 3,
+      "claims": 2,
+      "conditions": 2,
+      "sha256": "28aedf879db6c9a74e4bcdca54d9ba7d97c2bbe26341b7ad6f3a6b77fb24c3fa"
+    },
+    {
+      "id": "social-fairness@1.0.0",
+      "sources": 3,
+      "claims": 2,
+      "conditions": 2,
+      "sha256": "81ea96246c49f25230b9b45179d03a43752378aee55ea1753f7044b7b2e1c9ba"
+    },
+    {
+      "id": "work-passion@1.0.0",
+      "sources": 3,
+      "claims": 2,
+      "conditions": 2,
+      "sha256": "ca7ac24e0e2240fcd51c55f35e1f783a286e603ecd7f58d046a6c2216ded2c07"
+    }
+  ]
+}

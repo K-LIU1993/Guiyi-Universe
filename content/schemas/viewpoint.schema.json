@@ -1,0 +1,92 @@
+{
+  "type": "object",
+  "properties": {
+    "template": {
+      "const": "viewpoint"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,79}$"
+    },
+    "contentVersion": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"
+    },
+    "provenance": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "level": {
+              "enum": [
+                "real",
+                "teaching",
+                "ai_inference"
+              ]
+            },
+            "createdBy": {
+              "const": "human"
+            }
+          },
+          "required": [
+            "level",
+            "createdBy"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "level": {
+              "enum": [
+                "teaching",
+                "ai_inference"
+              ]
+            },
+            "createdBy": {
+              "const": "ai"
+            }
+          },
+          "required": [
+            "level",
+            "createdBy"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "sourceIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]{0,79}$"
+      },
+      "minItems": 1,
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "template",
+    "id",
+    "contentVersion",
+    "provenance",
+    "text",
+    "scope",
+    "sourceIds"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:guiyi:content:viewpoint:1"
+}

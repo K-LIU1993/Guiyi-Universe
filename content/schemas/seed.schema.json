@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:guiyi:content:seed:1",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "guiyi.divergence-island.seed"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,79}$"
+    },
+    "contentVersion": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "question": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "const": "teaching"
+        },
+        "createdBy": {
+          "const": "ai"
+        }
+      },
+      "required": [
+        "level",
+        "createdBy"
+      ],
+      "additionalProperties": false
+    },
+    "isTeachingSample": {
+      "const": true
+    },
+    "excerpt": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,79}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "pattern": "\\S"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "author": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "pattern": "\\S"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fetchedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "excerpt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "pattern": "\\S"
+          },
+          "isTeachingSample": {
+            "const": true
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "fetchedAt",
+          "excerpt",
+          "isTeachingSample"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 3,
+      "maxItems": 100
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,79}$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "pattern": "\\S"
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "scope"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 2,
+      "maxItems": 100
+    },
+    "conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "enum": [
+              "time.weekly_hours_plan",
+              "time.weekly_hours_actual"
+            ]
+          },
+          "op": {
+            "enum": [
+              "eq",
+              "neq",
+              "gte",
+              "lte"
+            ]
+          },
+          "value": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 168
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "field",
+          "op",
+          "value",
+          "label"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 2,
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "format",
+    "schemaVersion",
+    "id",
+    "contentVersion",
+    "title",
+    "question",
+    "provenance",
+    "isTeachingSample",
+    "excerpt",
+    "sources",
+    "claims",
+    "conditions"
+  ],
+  "additionalProperties": false
+}
