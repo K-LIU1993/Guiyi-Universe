@@ -12,3 +12,4 @@
 启动：npm.cmd run dev -- --port 5207 --strictPort --config src/explore/dev.config.js
 验收：node src/explore/acceptance.cjs
 旧explore-*截图为历史结果，以acceptance.json和新截图为准。
+- VERIFIED：2026-09-16 复核：工作区干净，提交 bc400b4 存在；127.0.0.1:5203 当前无监听，真实源仍不可验收。
