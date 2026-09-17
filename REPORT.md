@@ -4,11 +4,11 @@
 
 | GLB | 顶点数 | 三角数 | 文件字节数 | 数据来源 |
 |---|---:|---:|---:|---|
-| bloomy.glb | 1,140 | 2,240 | 172,736 | blender/evidence/bloomy.metrics.json |
-| world_overview.glb | 536 | 1,016 | 85,428 | blender/evidence/world_overview.metrics.json |
-| divergence_island.glb | 104 | 156 | 22,716 | blender/evidence/divergence_island.metrics.json |
+| bloomy.glb | 4,800 | 2,240 | 172,736 | GLB JSON header + blender/evidence/bloomy.metrics.json |
+| world_overview.glb | 2,160 | 1,016 | 85,428 | GLB JSON header + blender/evidence/world_overview.metrics.json |
+| divergence_island.glb | 312 | 156 | 22,716 | GLB JSON header + blender/evidence/divergence_island.metrics.json |
 
-以上顶点数、三角数和字节数均为已生成资产的实测值。Blender 回读、米制单位、Y-up 转换和尺寸核对：VERIFIED。
+以上顶点数为导出 GLB JSON 头中的 POSITION accessor 汇总；Blender 源网格顶点汇总分别为 bloomy 1,140、world_overview 536、divergence_island 104。三角数和字节数为已生成资产的实测值。Blender 回读、米制单位、Y-up 转换和尺寸核对：VERIFIED。
 
 ## gltf-transform inspect
 
@@ -44,3 +44,8 @@ inspect 统计显示：Bloomy 10 个 mesh primitive、每个 224 triangles；分
 - 三资产合计：3,412 triangles，280,880 B；同屏 500,000 triangles 与首场景 5 MB 目标，VERIFIED。
 
 取数脚本：blender/tools/verify_pipeline.py；Blender 版本：5.2.1 LTS。
+
+
+## JSON 头复核
+可复现方法：使用 Node.js 读取 GLB 20 字节 JSON chunk，汇总 meshes[].primitives[].attributes.POSITION accessor.count，并汇总 indices accessor.count / 3。
+复核结果：bloomy.glb 4,800 vertices / 2,240 triangles / 172,736 B；world_overview.glb 2,160 / 1,016 / 85,428 B；divergence_island.glb 312 / 156 / 22,716 B。
