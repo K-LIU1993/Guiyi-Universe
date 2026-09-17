@@ -1,22 +1,23 @@
 {
-  "controlled": {
-    "mock": {
-      "passed": true,
-      "consoleError": 0,
-      "pageerror": 0
-    },
-    "api-fixture": {
-      "passed": true,
-      "consoleError": 0,
-      "pageerror": 0
-    }
-  },
-  "live": {
-    "label": "当前展示本地示例数据（Mock 降级）",
-    "errors": [
-      "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
-    ],
-    "passed": false
-  },
-  "errors": []
+    "controlled":  {
+                       "mock":  {
+                                    "passed":  true,
+                                    "consoleError":  0,
+                                    "pageerror":  0
+                                },
+                       "apiFixture":  {
+                                          "passed":  true,
+                                          "consoleError":  0,
+                                          "pageerror":  0
+                                      }
+                   },
+    "live":  {
+                 "label":  "真实服务不可用：127.0.0.1:5203 无监听，页面回退 Mock",
+                 "passed":  false,
+                 "blockedBy":  "K-CONTENT/5203 unavailable"
+             },
+    "errors":  [
+
+               ],
+    "generatedAt":  "2026-09-17"
 }
