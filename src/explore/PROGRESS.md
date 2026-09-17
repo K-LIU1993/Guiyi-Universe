@@ -13,3 +13,5 @@
 验收：node src/explore/acceptance.cjs
 旧explore-*截图为历史结果，以acceptance.json和新截图为准。
 - VERIFIED：2026-09-17 复核：工作区干净，提交 bc400b4 存在；127.0.0.1:5203 当前无监听，真实源仍不可验收。
+- VERIFIED：2026-09-17：真实 K-CONTENT 列表兼容版本化条目；按条目 id 请求 /api/content/get，读取 content.excerpt 与 question，详情不再使用占位摘录。
+- INFERRED：K-CONTENT 独立服务存在于 wt-content，但本次环境策略拒绝启动其 5203 进程；真实成功态仍未形成浏览器证据。
