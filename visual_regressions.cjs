@@ -1,0 +1,31 @@
+const { chromium } = require(process.env.U_APP_PLAYWRIGHT);
+const fs = require('node:fs');
+(async () => {
+  const browser = await chromium.launch({ channel: 'msedge', headless: true, args: ['--enable-unsafe-swiftshader'] });
+  const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 } })).newPage();
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+  await page.goto('http://localhost:5205/divergence.html', { waitUntil: 'networkidle' });
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  fs.mkdirSync('evidence', { recursive: true });
+  const checks = [];
+  const shot = async (name) => page.screenshot({ path: 'evidence/' + name, fullPage: true });
+  await shot('p1-moment-01-opening.png'); checks.push({ name: 'opening renders', ok: await page.getByRole('button', { name: 'Record' }).isVisible() });
+  await page.getByRole('button', { name: 'Record' }).click(); await page.getByRole('button', { name: 'Next act' }).click();
+  await shot('p1-moment-02-evidence.png'); checks.push({ name: 'evidence placement surface', ok: await page.locator('.source').count() === 3 });
+  for (const source of await page.locator('.source').all()) { await source.dispatchEvent('pointerdown'); await source.dispatchEvent('pointerup'); }
+  await page.getByRole('button', { name: 'Commit support relation' }).click();
+  await page.getByRole('button', { name: 'Next act' }).click(); await shot('p1-moment-03-condition.png'); checks.push({ name: 'condition switch surface', ok: await page.getByRole('button', { name: 'Switch' }).isVisible() });
+  await page.getByRole('button', { name: 'Switch' }).click(); await page.getByRole('button', { name: 'Next act' }).click();
+  await shot('p1-moment-04-bridge.png'); checks.push({ name: 'counterexample surface', ok: await page.getByRole('button', { name: 'limit_scope' }).isVisible() });
+  await page.getByRole('button', { name: 'limit_scope' }).click(); await page.getByRole('button', { name: 'Next act' }).click();
+  await page.getByRole('button', { name: 'Save bridge' }).click(); await page.getByRole('button', { name: 'Next act' }).click();
+  await shot('p1-moment-05-forming.png'); checks.push({ name: 'forming surface', ok: await page.getByRole('button', { name: 'Form card' }).isVisible() });
+  await page.getByRole('button', { name: 'Form card' }).click();
+  checks.push({ name: 'save survives', ok: !!(await page.evaluate(() => localStorage.getItem('guiyi.divergence-island.save.v1'))) });
+  await page.reload(); checks.push({ name: 'reload preserves save', ok: !!(await page.evaluate(() => localStorage.getItem('guiyi.divergence-island.save.v1'))) });
+  fs.writeFileSync('evidence/visual-regressions.json', JSON.stringify({ softwareRaster: true, checks, errors }, null, 2));
+  console.log(JSON.stringify({ checks, errors })); await browser.close();
+})().catch(e => { console.error(e); process.exit(1); });

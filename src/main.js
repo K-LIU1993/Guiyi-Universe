@@ -17,6 +17,7 @@ import { AnswerUI } from './ui/answer.js';
 import { createModes } from './game/modes/index.js';
 import { loadAndBindBFlow } from './game/stage/visual/bFlowScene.js';
 import { createPerfObserver } from './game/stage/visual/perfObserver.js';
+import { createVisualMoments } from './game/stage/visual/moments.js';
 
 // Bloomy 的六岛深一层解说
 const EXPLAIN = {
@@ -47,6 +48,7 @@ let pack = null;
 let current = null;
 let generating = false;
 let modes = null;
+let visualMoments = null;
 let startSeq = 0;
 const modesDone = new Set();
 const stateBridge = {};
@@ -506,9 +508,18 @@ function boot() {
   effects = new Effects(universe.scene);
   universe.setEffects(effects);
   const perf = createPerfObserver(engine.renderer, {
-    onSample: (sample) => console.debug('[P1 perf]', sample),
+    onSample: (sample) => {
+      console.debug('[P1 perf]', sample);
+      if (window.__perf) window.__perf.samples.push(sample);
+    },
   });
-  loadAndBindBFlow({ scene: universe.scene }).catch((error) => {
+  window.__perf = { renderer: engine.renderer, samples: [], latest: null };
+  loadAndBindBFlow({ scene: universe.scene, applyAction: (action, payload) => {
+    if (action === 'bind_scene' && payload?.anchors) {
+      visualMoments = createVisualMoments({ anchors: payload.anchors, bloomy, cameraRig: engine.rig });
+      window.__visualMoments = visualMoments;
+    }
+  } }).catch((error) => {
     console.warn('[P1 visual] B-flow asset unavailable:', error.message);
   });
 
@@ -576,6 +587,7 @@ function boot() {
 
   engine.onFrame((dt) => {
     perf.tick();
+    if (window.__perf) window.__perf.latest = { ...engine.renderer.info.render };
     if (generating) engine.rig.dTheta += dt * 0.12;
     bloomy.update(dt);
     effects.update(dt);

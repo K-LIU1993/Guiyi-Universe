@@ -1,0 +1,34 @@
+{
+  "softwareRaster": true,
+  "checks": [
+    {
+      "name": "opening renders",
+      "ok": true
+    },
+    {
+      "name": "evidence placement surface",
+      "ok": true
+    },
+    {
+      "name": "condition switch surface",
+      "ok": true
+    },
+    {
+      "name": "counterexample surface",
+      "ok": true
+    },
+    {
+      "name": "forming surface",
+      "ok": true
+    },
+    {
+      "name": "save survives",
+      "ok": true
+    },
+    {
+      "name": "reload preserves save",
+      "ok": true
+    }
+  ],
+  "errors": []
+}

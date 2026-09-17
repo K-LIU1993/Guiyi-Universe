@@ -27,3 +27,21 @@
 
 HTTP 资源核对通过：页面、B流 meshopt GLB、manifest 均返回 200。当前环境无可用浏览器自动化后端，FPS/drawCalls/triangles 未采样。
 
+## 5205 软件光栅实测（2026-09-17 08:07，Edge headless，8.5s/档）
+
+| 档位 | Viewport | FPS | Draw calls | Triangles | 结论 |
+|---|---|---:|---:|---:|---|
+| 移动 | 390×844 | 78.47 | 328 | 16,238 | FPS/三角形通过；draw calls 超过 <100 |
+| 桌面 | 1280×800 | 77.51 | 800 | 31,778 | FPS/三角形通过；draw calls 超过 <200 |
+
+口径：Edge headless，--enable-unsafe-swiftshader，本机 ANGLE/Intel 渲染器；不代表真机性能。原始数据见 evidence/perf-sample.json。
+
+## 5205 软件光栅实测（2026-09-17 08:01，Edge headless，8.5s/档）
+
+| 档位 | Viewport | FPS 样本（首秒后） | Draw calls | Triangles | 预算结论 |
+|---|---|---:|---:|---:|---|
+| 移动 | 390×844 | 78–79 | 328 | 16,238 | FPS/三角形通过；draw calls 超过 <100 |
+| 桌面 | 1280×800 | 77–78 | 800 | 31,778 | FPS/三角形通过；draw calls 超过 <200 |
+
+口径：Edge headless + --enable-unsafe-swiftshader 软件光栅，不代表真机性能。原始数据见 evidence/perf-sample.json；截图见 evidence/p1-mobile-overview.png 与 evidence/p1-desktop-overview.png。
+
